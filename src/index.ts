@@ -38,7 +38,7 @@ function assign(target, from) {
     return to;
 }
 
-export function Resource(ns: string) {
+export function Resource(ns: string):any {
     return (Clazz) => {
         const Result = function (...args) {
             const instance = new Clazz(...args);

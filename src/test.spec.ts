@@ -1,7 +1,6 @@
 import {Controller, useModel} from './index'
 
-// @ts-ignore
-@Controller
+@Controller('hello')
 class Test {
     name = 'lichun'
     getName() {

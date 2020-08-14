@@ -1,7 +1,4 @@
-export declare function Resource(ns: string): (Clazz: any) => {
-    (...args: any[]): any;
-    ns: string;
-};
+export declare function Resource(ns: string): any;
 export declare const useModel: <T>(T: new () => T) => T;
 export declare const Controller: typeof Resource;
 export declare const resetModel: <T>(T: new () => T) => void;
