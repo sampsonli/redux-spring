@@ -38,7 +38,7 @@ function assign(target, from) {
     return to;
 }
 
-export function Resource(ns: string):any {
+export function Service(ns: string):any {
     return (Clazz) => {
         const Result = function (...args) {
             const instance = new Clazz(...args);
@@ -59,14 +59,8 @@ export function Resource(ns: string):any {
                 }
             }
 
-            // const prototype = Object.create(instance);
-            const prototype = {};
-            // @ts-ignore
-            prototype.ns = ns;
-            // const _prototype = Object.create(instance);
-            const _prototype = {};
-            // @ts-ignore
-            _prototype.ns = ns;
+            const prototype = {ns};
+            const _prototype = {ns};
             Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
                 if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
                     const origin = Clazz.prototype[key];
@@ -199,7 +193,7 @@ export function Resource(ns: string):any {
     };
 }
 
-export const useModel = <T>(Clazz: { new(): T; }): T => {
+export const useModel = <T>(Clazz: { new(): T }): T => {
     // @ts-ignore
     const ns = Clazz.ns || Clazz;
     const [data, setData] = useState(() => _store.getState()[ns]);
@@ -210,16 +204,15 @@ export const useModel = <T>(Clazz: { new(): T; }): T => {
 
     return data;
 };
-export const Controller = Resource;
-export const resetModel = <T>(Clazz: { new(): T; }) => {
+export const resetModel = <T>(Clazz: { new(): T }) => {
     // @ts-ignore
     const ns = Clazz.ns || Clazz;
     allProto[ns].reset();
 };
 
-export function AutoWired<T>(Clazz: { new(): T; } | String) {
+export function Inject<T>(Clazz: { new(): T }) {
     // @ts-ignore
-    const ns = Clazz.ns || Clazz;
+    const ns = Clazz.ns;
     return (clazz, attr) => {
         if (!clazz.__wired) {
             clazz.__wired = {};
@@ -227,6 +220,19 @@ export function AutoWired<T>(Clazz: { new(): T; } | String) {
         clazz.__wired[attr] = ns;
     };
 }
+
+export function Resource(ns: string) {
+    return (clazz, attr) => {
+        if (!clazz.__wired) {
+            clazz.__wired = {};
+        }
+        clazz.__wired[attr] = ns;
+    };
+}
+
+export const Autowired = Inject;
+export const Controller = Service;
+export const Model = Service;
 
 export default (store, asyncReducers = {}) => {
     _store = store;

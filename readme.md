@@ -20,6 +20,13 @@ react+redux 组合已经是目前主流开发模式， 但是使用原生redux�
 7. 完美支持ts开发， 拥有完善的自动代码提示
 8. 兼容老版本浏览器（保证react+redux版本同时支持）
 
+## redux-spring 核心优势
+1. 基于面向对象，完全支持ts
+2. 依赖注入（DI)
+3. 使用简单， 学习成本低
+4. 完美的支持异步操作， 后续会详细介绍
+5. 老版本浏览器充分支持
+
 ## 参考项目
 相关使用方法可以参考
 
@@ -29,37 +36,58 @@ react+redux 组合已经是目前主流开发模式， 但是使用原生redux�
 ## 快速开始
 > 实现一个简单的demo， 一个页面有两个按钮，一个点击+1， 一个点击-1，输出当前数字
 1. 安装redux-spring
-~~~bash
-yarn add redux-spring
-~~~
+    ~~~bash
+    yarn add redux-spring
+    ~~~
 2. 定义store并注入到spring中
-~~~javascript
-import spring from 'redux-spring';
-const store = createStore();
-spring(store, asyncReducers); // asyncReducers是老版本维护的所有reducer， 新开项目可以不用传
-~~~
+    ~~~javascript
+    import spring from 'redux-spring';
+    const store = createStore();
+    spring(store, asyncReducers); // asyncReducers是老版本维护的所有reducer， 新开项目可以不用传
+    ~~~
 4. 定义model
-~~~javascript
-import {Controller} from 'redux-spring';
-@Controller('demo')
-class DemoModel {
-    number = 100;
+    ~~~javascript
+    import {Controller} from 'redux-spring';
+    @Controller('demo')
+    class DemoModel {
+        number = 100;
+    
+        addOne() {
+            this.number = this.number + 1;
+        }
+    
+        minusOne() {
+            this.number--;
+        }
+    }
+    export default DemoModel;
+    ~~~
 
-    addOne() {
-		this.number = this.number + 1;
-	}
-
-    minusOne() {
-		this.number--;
-	}
-}
-export default DemoModel;
-~~~
->定义model主要由三部分组成
-	1. 名字空间;
-		>名字空间必须全局唯一,  声明名字空间有多种方式， 后面有更详细说明
-	2. 类属性;
-		>类中的属性会同步到redux store中，类属性可以是私有属性（推荐），也可以是公共属性， 私有属性同步到redux store中会移除'#'， 比如上面案例中 '#number' 保存到redux中会变为'number'
-	3. 类方法;
-		>类方法总this代表当前model对于在store中state的副本， 可以直接读取对应属性也可以修改对应属性， 每次修改完成后会同步到store中state， <font color="red">切记</font>类方法不能为箭头方法， 否则this无法使用。
-	4. 定义模块引入了注解， 需要安装相关babel插件
+2. 使用model
+    ~~~javascript
+   import {useModel} from 'redux-spring';
+    import HomeModel from '../../models/DemoModel';
+    
+    export default () => {
+        const model = useModel(DemoModel);
+        return (
+            <div className={style.container}>
+                <div className={style.content}>
+                    <div className={style.txt} onClick={model.minusOne}>
+                        minus
+                    </div>
+    
+                    <div className={style.txt}>
+                        {model.number}
+                    </div>
+    
+                    <div className={style.txt} onClick={model.addOne}>
+                        add
+                    </div>
+    
+                </div>
+    
+            </div>
+        );
+    };
+    ~~~

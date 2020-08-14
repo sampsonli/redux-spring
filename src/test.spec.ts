@@ -1,6 +1,6 @@
-import {Controller, useModel} from './index'
+import {Controller, Service, useModel} from './index'
 
-@Controller('hello')
+@Service('hello')
 class Test {
     name = 'lichun'
     getName() {
