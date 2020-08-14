@@ -1,0 +1,35 @@
+{
+  "name": "redux-spring",
+  "version": "1.0.0",
+  "description": "react spring redux 模块化 依赖注入",
+  "author": "sampsonli",
+  "keywords": [
+    "react",
+    "redux",
+    "spring",
+    "依赖注入",
+    "按需加载",
+    "模块化"
+  ],
+  "homepage": "https://github.com/sampsonli/redux-spring",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc ./src/test.spec.ts"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "peerDependencies": {
+    "redux": ">=2.0.0",
+    "react": ">=0.14.0"
+  },
+  "devDependencies": {
+    "react": ">=0.14.0",
+    "redux": "^2.0.0",
+    "typescript": "^3.5.2"
+  }
+}
