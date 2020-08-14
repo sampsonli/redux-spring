@@ -206,7 +206,7 @@ export const resetModel = <T>(T:{new(): T; }) => {
 export function AutoWired<T>(T:{new(): T; } | String) {
     // @ts-ignore
     const ns = T.ns || T;
-    return (clazz, attr) => {
+    return (clazz, attr: T) => {
         if (!clazz.__wired) {
             clazz.__wired = {};
         }
