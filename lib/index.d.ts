@@ -1,5 +1,5 @@
 export declare function Resource(ns: string): (Clazz: any) => {
-    (...args: any[]): {};
+    (...args: any[]): any;
     ns: string;
 };
 export declare const useModel: <T>(T: new () => T) => T;

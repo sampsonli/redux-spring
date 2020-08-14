@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import {useState, useEffect} from 'react';
+
 declare var Promise
 let _store;
 let _asyncReducers = {};
@@ -18,7 +19,26 @@ function injectReducer(key, reducer) {
 const allProto = {};
 const allBeans = {};
 
-export function Resource(ns:string) {
+function assign(target, from) {
+    // @ts-ignore
+    if(Object.assgin) return Object.assign(...arguments);
+    const to = Object(target);
+    for (let index = 1; index < arguments.length; index++) {
+        const nextSource = arguments[index];
+
+        if (nextSource !== null && nextSource !== undefined) {
+            for (var nextKey in nextSource) {
+                // Avoid bugs when hasOwnProperty is shadowed
+                if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                    to[nextKey] = nextSource[nextKey];
+                }
+            }
+        }
+    }
+    return to;
+}
+
+export function Resource(ns: string) {
     return (Clazz) => {
         const Result = function (...args) {
             const instance = new Clazz(...args);
@@ -27,14 +47,15 @@ export function Resource(ns:string) {
             if (!ns) {
                 throw new Error("please define 'ns' before");
             }
+
             function doUpdate(newState, oldState) {
                 const keys = Object.keys(newState);
                 const diff = keys.some(key => newState[key] !== oldState[key]);
                 if (diff) {
-                    newState = {...newState};
+                    const result = Object.create(allProto[ns]);
                     // @ts-ignore
-                    Object.setPrototypeOf(newState, allProto[ns]);
-                    _store.dispatch({type: `spring/${ns}`, payload: newState});
+                    assign(result, newState);
+                    _store.dispatch({type: `spring/${ns}`, payload: result});
                 }
             }
 
@@ -130,18 +151,17 @@ export function Resource(ns:string) {
                 const state = _store.getState()[ns];
                 const keys = Object.keys(props);
                 if (keys.some(key => props[key] !== state[key])) {
-                    const _state = {...state, ...props};
+                    const _state = Object.create(allProto[ns]);
                     // @ts-ignore
-                    Object.setPrototypeOf(_state, allProto[ns]);
+                    assign(_state, state, props);
                     _store.dispatch({type: `spring/${ns}`, payload: _state});
                 }
             };
             // @ts-ignore
             _prototype.setData = prototype.setData;
 
-            const initState = {};
-            // @ts-ignore
-            Object.setPrototypeOf(initState, prototype);
+
+            const initState = Object.create(prototype);
 
             /**
              * 重置模块数据到初始状态， 一般用于组件销毁的时候调用
@@ -170,14 +190,12 @@ export function Resource(ns:string) {
             };
             injectReducer(ns, reducer);
             if (allProto[ns]) {
-                // @ts-ignore
-                Object.setPrototypeOf(_store.getState()[ns], prototype);
+                const state = Object.create(prototype);
+                assign(state, _store.getState()[ns]);
+                _store.dispatch({type: `spring/${ns}`, payload: state});
             }
             allProto[ns] = prototype;
-            const resultInstance = {};
-            // @ts-ignore
-            Object.setPrototypeOf(resultInstance, prototype);
-            return resultInstance;
+            return initState;
         };
         Result.ns = ns;
         // @ts-ignore
@@ -185,7 +203,8 @@ export function Resource(ns:string) {
         return Result;
     };
 }
-export const useModel = <T>(T:{new(): T; }):T => {
+
+export const useModel = <T>(T: { new(): T; }): T => {
     // @ts-ignore
     const ns = T.ns || T;
     const [data, setData] = useState(() => _store.getState()[ns]);
@@ -197,13 +216,13 @@ export const useModel = <T>(T:{new(): T; }):T => {
     return data;
 };
 export const Controller = Resource;
-export const resetModel = <T>(T:{new(): T; }) => {
+export const resetModel = <T>(T: { new(): T; }) => {
     // @ts-ignore
     const ns = T.ns || T;
     allProto[ns].reset();
 };
 
-export function AutoWired<T>(T:{new(): T; } | String) {
+export function AutoWired<T>(T: { new(): T; } | String) {
     // @ts-ignore
     const ns = T.ns || T;
     return (clazz, attr: T) => {
@@ -213,6 +232,7 @@ export function AutoWired<T>(T:{new(): T; } | String) {
         clazz.__wired[attr] = ns;
     };
 }
+
 export default (store, asyncReducers = {}) => {
     _store = store;
     _asyncReducers = asyncReducers;
