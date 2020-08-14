@@ -21,13 +21,13 @@ const allBeans = {};
 
 function assign(target, from) {
     // @ts-ignore
-    if(Object.assgin) return Object.assign(...arguments);
+    if (Object.assgin) return Object.assign(...arguments);
     const to = Object(target);
     for (let index = 1; index < arguments.length; index++) {
         const nextSource = arguments[index];
 
         if (nextSource !== null && nextSource !== undefined) {
-            for (var nextKey in nextSource) {
+            for (const nextKey in nextSource) {
                 // Avoid bugs when hasOwnProperty is shadowed
                 if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
                     to[nextKey] = nextSource[nextKey];
@@ -67,11 +67,7 @@ export function Resource(ns: string):any {
             const _prototype = {};
             // @ts-ignore
             _prototype.ns = ns;
-            let superProps = [];
-            if (Object.getPrototypeOf(Clazz) !== Function.prototype) {
-                superProps = Object.getOwnPropertyNames(Object.getPrototypeOf(Clazz).prototype);
-            }
-            [...superProps, ...Object.getOwnPropertyNames(Clazz.prototype)].forEach(key => {
+            Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
                 if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
                     const origin = Clazz.prototype[key];
                     prototype[key] = function (...params) {
@@ -160,7 +156,6 @@ export function Resource(ns: string):any {
             // @ts-ignore
             _prototype.setData = prototype.setData;
 
-
             const initState = Object.create(prototype);
 
             /**
@@ -204,9 +199,9 @@ export function Resource(ns: string):any {
     };
 }
 
-export const useModel = <T>(T: { new(): T; }): T => {
+export const useModel = <T>(Clazz: { new(): T; }): T => {
     // @ts-ignore
-    const ns = T.ns || T;
+    const ns = Clazz.ns || Clazz;
     const [data, setData] = useState(() => _store.getState()[ns]);
     useEffect(() => _store.subscribe(() => {
         const ret = _store.getState()[ns];
@@ -216,16 +211,16 @@ export const useModel = <T>(T: { new(): T; }): T => {
     return data;
 };
 export const Controller = Resource;
-export const resetModel = <T>(T: { new(): T; }) => {
+export const resetModel = <T>(Clazz: { new(): T; }) => {
     // @ts-ignore
-    const ns = T.ns || T;
+    const ns = Clazz.ns || Clazz;
     allProto[ns].reset();
 };
 
-export function AutoWired<T>(T: { new(): T; } | String) {
+export function AutoWired<T>(Clazz: { new(): T; } | String) {
     // @ts-ignore
-    const ns = T.ns || T;
-    return (clazz, attr: T) => {
+    const ns = Clazz.ns || Clazz;
+    return (clazz, attr) => {
         if (!clazz.__wired) {
             clazz.__wired = {};
         }
