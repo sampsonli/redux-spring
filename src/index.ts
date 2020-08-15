@@ -47,19 +47,24 @@ export function service(ns: string):any {
         const Result = function (...args) {
             const instance = new Clazz(...args);
             const __wired = Clazz.prototype.__wired || {};
+            const wiredList = Object.keys(__wired);
             delete Clazz.prototype.__wired;
             if (!ns) {
                 throw new Error("please define 'ns' before");
             }
 
-            function doUpdate(newState, oldState) {
+            function doUpdate(newState) {
                 const keys = Object.keys(newState);
+                const rootState = _store.getState();
+                const oldState = rootState[ns];
                 const diff = keys.some(key => newState[key] !== oldState[key]);
                 if (diff) {
-                    const result = Object.create(allProto[ns]);
-                    // @ts-ignore
-                    assign(result, newState);
-                    _store.dispatch({type: `spring/${ns}`, payload: result});
+                    _store.dispatch({type: `spring/${ns}`, payload: newState});
+                } else {
+                    const diff = wiredList.some(key => newState[key] !== rootState[__wired[key]]);
+                    if(diff) {
+                        _store.dispatch({type: `spring/${ns}`, payload: newState});
+                    }
                 }
             }
 
@@ -74,14 +79,12 @@ export function service(ns: string):any {
                             const runGen = (ge, val, isError, e) => {
                                 const rootState = _store.getState();
                                 const state = rootState[ns];
-                                const _state = {};
                                 Object.keys(state).forEach((_key) => {
                                     if (__wired[key]) {
                                         _this[_key] = rootState[__wired[key]];
                                     } else {
                                         _this[_key] = state[_key];
                                     }
-                                    _state[_key] = _this[_key];
                                 });
                                 let tmp;
                                 try {
@@ -91,10 +94,10 @@ export function service(ns: string):any {
                                         tmp = ge.next(val);
                                     }
                                 } catch (error) {
-                                    doUpdate(_this, _state);
+                                    doUpdate(_this);
                                     ge.throw(error);
                                 }
-                                doUpdate(_this, _state);
+                                doUpdate(_this);
                                 if (tmp.done) {
                                     return tmp.value;
                                 }
@@ -107,25 +110,22 @@ export function service(ns: string):any {
                         }
                         const rootState = _store.getState();
                         const state = rootState[ns];
-                        let _state = {};
                         Object.keys(state).forEach(_key => {
                             if (__wired[key]) {
                                 _this[_key] = rootState[__wired[key]];
                             } else {
                                 _this[_key] = state[_key];
                             }
-                            _state[_key] = _this[_key];
                         });
                         const result = origin.bind(_this)(...params);
                         if (result && typeof result.then === 'function') {
-                            doUpdate(_this, _state);
-                            _state = {..._this};
+                            doUpdate(_this);
                             return result.then(data => {
-                                doUpdate(_this, _state);
+                                doUpdate(_this);
                                 return data;
                             });
                         }
-                        doUpdate(_this, _state);
+                        doUpdate(_this);
                         return result;
                     };
                     if (origin.prototype.toString() === '[object Generator]') {
@@ -145,10 +145,7 @@ export function service(ns: string):any {
                 const state = _store.getState()[ns];
                 const keys = Object.keys(props);
                 if (keys.some(key => props[key] !== state[key])) {
-                    const _state = Object.create(allProto[ns]);
-                    // @ts-ignore
-                    assign(_state, state, props);
-                    _store.dispatch({type: `spring/${ns}`, payload: _state});
+                    _store.dispatch({type: `spring/${ns}`, payload: {...state, ...props}});
                 }
             };
             // @ts-ignore
@@ -169,23 +166,23 @@ export function service(ns: string):any {
                     prototype[key] = instance[key];
                     return;
                 }
-                if (__wired[key]) {
-                    initState[key] = rootState[__wired[key]];
-                    return;
-                }
                 initState[key] = instance[key];
             });
             const reducer = (state = initState, {type, payload}) => {
                 if (type === `spring/${ns}`) {
-                    return payload;
+                    const rootState = _store.getState();
+                    const result = Object.create(prototype);
+                    assign(result, payload);
+                    wiredList.forEach(key => {
+                        result[key] = rootState[__wired[key]];
+                    })
+                    return result;
                 }
                 return state;
             };
             injectReducer(ns, reducer);
             if (allProto[ns]) {
-                const state = Object.create(prototype);
-                assign(state, _store.getState()[ns]);
-                _store.dispatch({type: `spring/${ns}`, payload: state});
+                _store.dispatch({type: `spring/${ns}`, payload: _store.getState()[ns]});
             }
             allProto[ns] = prototype;
             return initState;
