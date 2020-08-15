@@ -47,8 +47,8 @@ react+redux 组合已经是目前主流开发模式， 但是使用原生redux�
     ~~~
 4. 定义model
     ~~~javascript
-    import {Controller} from 'redux-spring';
-    @Controller('demo')
+    import {model} from 'redux-spring';
+    @model('demo')
     class DemoModel {
         number = 100;
     

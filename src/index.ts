@@ -39,7 +39,7 @@ function assign(target, from) {
 }
 
 /**
- * 初始化模块
+ * 创建模块
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
 export function service(ns: string):any {
@@ -201,7 +201,7 @@ export function service(ns: string):any {
  * react hooks 方式获取模块类实例
  * @param Class 模块类
  */
-export const useModel = <T>(Class: { new(): T }): T => {
+export const useModel = <T extends Model | Object>(Class: { new(): T }): T => {
     // @ts-ignore
     const ns = Class.ns || Class;
     const [data, setData] = useState(() => _store.getState()[ns]);
@@ -214,9 +214,9 @@ export const useModel = <T>(Class: { new(): T }): T => {
 };
 /**
  * 重置模块数据
- * @param Class 模块类
+ * @param Class 模块类|模块名称
  */
-export const resetModel = <T>(Class: { new(): T }) => {
+export const resetModel = <T extends Model | Object>(Class: { new(): T } | string) => {
     // @ts-ignore
     const ns = Class.ns || Class;
     allProto[ns].reset();
@@ -225,7 +225,7 @@ export const resetModel = <T>(Class: { new(): T }) => {
  * 按照类型自动注入Model实例
  * @param Class 模块类
  */
-export function inject<T>(Class: { new(): T }) {
+export function inject<T extends Model | Object>(Class: { new(): T }) {
     // @ts-ignore
     const ns = Class.ns;
     return (clazz, attr) => {
@@ -258,11 +258,27 @@ export class Model {
         return null;
     }
 }
-
+/**
+ * 按照类型自动注入Model实例
+ * @param Class 模块类
+ */
 export const autowired = inject;
+/**
+ * 创建模块
+ * @param ns 模块名称， 模块名称唯一， 不能有冲突
+ */
 export const controller = service;
+/**
+ * 创建模块
+ * @param ns 模块名称， 模块名称唯一， 不能有冲突
+ */
 export const model = service;
 
+/**
+ * 初始化redux-spring
+ * @param store 需要注入的store
+ * @param asyncReducers 兼容老reducer集合
+ */
 export default (store, asyncReducers = {}) => {
     _store = store;
     _asyncReducers = asyncReducers;

@@ -1,6 +1,6 @@
 {
   "name": "redux-spring",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "react spring redux 模块化 依赖注入",
   "author": "sampsonli",
   "keywords": [
