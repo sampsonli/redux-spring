@@ -169,10 +169,6 @@ export function service(ns: string):any {
             };
             const rootState = _store.getState();
             Object.getOwnPropertyNames(instance).forEach(key => {
-                if (key.indexOf('_') === 0) {
-                    prototype[key] = instance[key];
-                    return;
-                }
                 if (__wired[key]) {
                     initState[key] = rootState[__wired[key]];
                     return;
