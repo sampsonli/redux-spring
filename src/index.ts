@@ -57,14 +57,9 @@ export function service(ns: string):any {
                 const keys = Object.keys(newState);
                 const rootState = _store.getState();
                 const oldState = rootState[ns];
-                const diff = keys.some(key => newState[key] !== oldState[key]);
+                const diff = keys.some(key => newState[key] !== oldState[key]) || wiredList.some(key => newState[key] !== rootState[__wired[key]]);
                 if (diff) {
                     _store.dispatch({type: `spring/${ns}`, payload: newState});
-                } else {
-                    const diff = wiredList.some(key => newState[key] !== rootState[__wired[key]]);
-                    if(diff) {
-                        _store.dispatch({type: `spring/${ns}`, payload: newState});
-                    }
                 }
             }
 
