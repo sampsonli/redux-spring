@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux';
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect, Component, createElement} from 'react';
 
 declare var Promise
 let _store;
@@ -229,6 +229,59 @@ export function Resource(ns: string) {
         clazz.__wired[attr] = ns;
     };
 }
+
+export const connect = (Clazz) => {
+   return (Comp) => class SpringNode extends Component{
+       state = {}
+       constructor(props) {
+           super(props);
+           const rootState = _store.getState();
+           if(Clazz.ns) {
+               this.state = {
+                   model: rootState[Clazz.ns]
+               }
+           } else {
+               Object.keys(Clazz).forEach(key => this.state[key] = rootState[Clazz[key].ns])
+           }
+       }
+
+       componentDidMount() {
+           // @ts-ignore
+           this.unSubscribe = _store.subscribe(() => {
+               const rootState = _store.getState();
+               if(Clazz.ns) {
+                   // @ts-ignore
+                   if(this.state.model !== rootState[Clazz.ns]) {
+                       // @ts-ignore
+                       this.setState({
+                           model: rootState[Clazz.ns],
+                       })
+                   }
+               } else {
+                   const modelList = Object.keys(this.state);
+                   const diff = modelList.filter(key => this.state[key] !== rootState[Clazz[key].ns]);
+                   if(diff.length) {
+                       const result = {};
+                       diff.forEach(key => {
+                           result[key] = rootState[Clazz[key].ns]
+                       })
+                       // @ts-ignore
+                       this.setState(result)
+                   }
+               }
+           })
+       }
+       componentWillUnmount() {
+           // @ts-ignore
+           this.unSubscribe();
+
+       }
+       render() {
+           // @ts-ignore
+           return createElement(Comp, {...this.props, ...this.state})
+       }
+   }
+};
 
 export const Autowired = Inject;
 export const Controller = Service;

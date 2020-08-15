@@ -5,6 +5,14 @@ export declare function Inject<T>(Clazz: {
     new (): T;
 }): (clazz: any, attr: any) => void;
 export declare function Resource(ns: string): (clazz: any, attr: any) => void;
+export declare const connect: (Clazz: any) => (Comp: any) => {
+    new (props: any): {
+        state: {};
+        componentDidMount(): void;
+        componentWillUnmount(): void;
+        render(): any;
+    };
+};
 export declare const Autowired: typeof Inject;
 export declare const Controller: typeof Service;
 export declare const Model: typeof Service;
