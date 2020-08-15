@@ -59,6 +59,9 @@ export function service(ns: string):any {
                 const oldState = rootState[ns];
                 const diff = keys.some(key => newState[key] !== oldState[key]) || wiredList.some(key => newState[key] !== rootState[__wired[key]]);
                 if (diff) {
+                    wiredList.forEach(key => {
+                        newState[key] = rootState[__wired[key]];
+                    })
                     _store.dispatch({type: `spring/${ns}`, payload: newState});
                 }
             }
@@ -140,7 +143,13 @@ export function service(ns: string):any {
                 const state = _store.getState()[ns];
                 const keys = Object.keys(props);
                 if (keys.some(key => props[key] !== state[key])) {
-                    _store.dispatch({type: `spring/${ns}`, payload: {...state, ...props}});
+                    const _state = Object.create(allProto[ns]);
+                    // @ts-ignore
+                    assign(_state, state, props);
+                    wiredList.forEach(key => {
+                        _state[key] = rootState[__wired[key]];
+                    })
+                    _store.dispatch({type: `spring/${ns}`, payload: _state});
                 }
             };
             // @ts-ignore
@@ -153,6 +162,9 @@ export function service(ns: string):any {
              */
             // @ts-ignore
             prototype.reset = function () {
+                wiredList.forEach(key => {
+                    initState[key] = rootState[__wired[key]];
+                })
                 _store.dispatch({type: `spring/${ns}`, payload: initState});
             };
             const rootState = _store.getState();
@@ -161,16 +173,16 @@ export function service(ns: string):any {
                     prototype[key] = instance[key];
                     return;
                 }
+                if (__wired[key]) {
+                    initState[key] = rootState[__wired[key]];
+                    return;
+                }
                 initState[key] = instance[key];
             });
             const reducer = (state = initState, {type, payload}) => {
                 if (type === `spring/${ns}`) {
-                    const rootState = _store.getState();
                     const result = Object.create(prototype);
                     assign(result, payload);
-                    wiredList.forEach(key => {
-                        result[key] = rootState[__wired[key]];
-                    })
                     return result;
                 }
                 return state;
