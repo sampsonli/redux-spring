@@ -38,7 +38,11 @@ function assign(target, from) {
     return to;
 }
 
-export function Service(ns: string):any {
+/**
+ * 初始化模块
+ * @param ns 模块名称， 模块名称唯一， 不能有冲突
+ */
+export function service(ns: string):any {
     return (Clazz) => {
         const Result = function (...args) {
             const instance = new Clazz(...args);
@@ -193,9 +197,13 @@ export function Service(ns: string):any {
     };
 }
 
-export const useModel = <T>(Clazz: { new(): T }): T => {
+/**
+ * react hooks 方式获取模块类实例
+ * @param Class 模块类
+ */
+export const useModel = <T>(Class: { new(): T }): T => {
     // @ts-ignore
-    const ns = Clazz.ns || Clazz;
+    const ns = Class.ns || Class;
     const [data, setData] = useState(() => _store.getState()[ns]);
     useEffect(() => _store.subscribe(() => {
         const ret = _store.getState()[ns];
@@ -204,15 +212,22 @@ export const useModel = <T>(Clazz: { new(): T }): T => {
 
     return data;
 };
-export const resetModel = <T>(Clazz: { new(): T }) => {
+/**
+ * 重置模块数据
+ * @param Class 模块类
+ */
+export const resetModel = <T>(Class: { new(): T }) => {
     // @ts-ignore
-    const ns = Clazz.ns || Clazz;
+    const ns = Class.ns || Class;
     allProto[ns].reset();
 };
-
-export function Inject<T>(Clazz: { new(): T }) {
+/**
+ * 按照类型自动注入Model实例
+ * @param Class 模块类
+ */
+export function inject<T>(Class: { new(): T }) {
     // @ts-ignore
-    const ns = Clazz.ns;
+    const ns = Class.ns;
     return (clazz, attr) => {
         if (!clazz.__wired) {
             clazz.__wired = {};
@@ -221,7 +236,11 @@ export function Inject<T>(Clazz: { new(): T }) {
     };
 }
 
-export function Resource(ns: string) {
+/**
+ * 按照模块名自动注入Model实例
+ * @param ns 模块名称
+ */
+export function resource(ns: string) {
     return (clazz, attr) => {
         if (!clazz.__wired) {
             clazz.__wired = {};
@@ -230,9 +249,19 @@ export function Resource(ns: string) {
     };
 }
 
-export const Autowired = Inject;
-export const Controller = Service;
-export const Model = Service;
+/**
+ * 基础模块， 最佳实践，每个模块都应继承基础模块
+ */
+export class Model {
+    static ns = '';
+    setData(data) {
+        return null;
+    }
+}
+
+export const autowired = inject;
+export const controller = service;
+export const model = service;
 
 export default (store, asyncReducers = {}) => {
     _store = store;
