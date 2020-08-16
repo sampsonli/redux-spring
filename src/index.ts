@@ -176,6 +176,9 @@ export function service(ns: string):any {
                 }
                 initState[key] = finalInstance[key];
             });
+            if(rootState[ns]) {
+                rootState[ns] = initState;
+            }
             const reducer = (state = initState, {type, payload}) => {
                 if (type === `spring/${ns}`) {
                     const result = Object.create(prototype);
