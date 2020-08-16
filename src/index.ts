@@ -167,8 +167,8 @@ export function service(ns: string):any {
                 })
                 _store.dispatch({type: `spring/${ns}`, payload: initState});
             };
-            const rootState = _store.getState();
-            const finalInstance = rootState[ns] ? rootState[ns] : instance
+            const rootState = _store.getState() || {};
+            const finalInstance = rootState[ns] ? rootState[ns] : instance;
             Object.getOwnPropertyNames(instance).forEach(key => {
                 if (__wired[key]) {
                     initState[key] = rootState[__wired[key]];
