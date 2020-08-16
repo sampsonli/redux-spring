@@ -17,7 +17,6 @@ function injectReducer(key, reducer) {
 }
 
 const allProto = {};
-const allBeans = {};
 
 function assign(target, from) {
     // @ts-ignore
@@ -44,7 +43,7 @@ function assign(target, from) {
  */
 export function service(ns: string):any {
     return (Clazz) => {
-        const Result = function (...args) {
+        const Proxy = function (...args) {
             const instance = new Clazz(...args);
             const __wired = Clazz.prototype.__wired || {};
             const wiredList = Object.keys(__wired);
@@ -189,12 +188,11 @@ export function service(ns: string):any {
             };
             injectReducer(ns, reducer);
             allProto[ns] = prototype;
-            return initState;
         };
-        Result.ns = ns;
-        // @ts-ignore
-        allBeans[ns] = new Result();
-        return Result;
+        Proxy.ns = ns;
+        new Proxy();
+        Proxy.prototype = allProto[ns];
+        return Proxy;
     };
 }
 
