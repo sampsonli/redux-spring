@@ -168,12 +168,13 @@ export function service(ns: string):any {
                 _store.dispatch({type: `spring/${ns}`, payload: initState});
             };
             const rootState = _store.getState();
+            const finalInstance = rootState[ns] ? rootState[ns] : instance
             Object.getOwnPropertyNames(instance).forEach(key => {
                 if (__wired[key]) {
                     initState[key] = rootState[__wired[key]];
                     return;
                 }
-                initState[key] = instance[key];
+                initState[key] = finalInstance[key];
             });
             const reducer = (state = initState, {type, payload}) => {
                 if (type === `spring/${ns}`) {
@@ -184,9 +185,6 @@ export function service(ns: string):any {
                 return state;
             };
             injectReducer(ns, reducer);
-            if (allProto[ns]) {
-                _store.dispatch({type: `spring/${ns}`, payload: _store.getState()[ns]});
-            }
             allProto[ns] = prototype;
             return initState;
         };
@@ -254,8 +252,11 @@ export function resource(ns: string) {
  */
 export class Model {
     static ns = '';
-    setData(data) {
-        return null;
+    setData(data: Object) {
+        return;
+    }
+    reset() {
+        return;
     }
 }
 /**

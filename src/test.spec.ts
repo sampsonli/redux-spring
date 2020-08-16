@@ -1,7 +1,7 @@
-import {Controller, Service, useModel} from './index'
+import {Model, model, useModel} from './index'
 
-@Service('hello')
-class Test {
+@model('hello')
+class Test extends Model{
     name = 'lichun'
     getName() {
         return this.name

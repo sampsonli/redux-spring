@@ -30,7 +30,8 @@ export declare function resource(ns: string): (clazz: any, attr: any) => void;
  */
 export declare class Model {
     static ns: string;
-    setData(data: any): any;
+    setData(data: Object): void;
+    reset(): void;
 }
 /**
  * 按照类型自动注入Model实例
