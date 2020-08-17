@@ -142,13 +142,7 @@ export function service(ns: string):any {
                 const state = _store.getState()[ns];
                 const keys = Object.keys(props);
                 if (keys.some(key => props[key] !== state[key])) {
-                    const _state = Object.create(allProto[ns]);
-                    // @ts-ignore
-                    assign(_state, state, props);
-                    wiredList.forEach(key => {
-                        _state[key] = rootState[__wired[key]];
-                    })
-                    _store.dispatch({type: `spring/${ns}`, payload: _state});
+                    _store.dispatch({type: `spring/${ns}`, payload: {...state, ...props}});
                 }
             };
             // @ts-ignore
@@ -175,14 +169,22 @@ export function service(ns: string):any {
                 }
                 initState[key] = finalInstance[key];
             });
-            if(rootState[ns]) {
+            if(rootState[ns]) { // 热更新时候用得到
                 rootState[ns] = initState;
             }
             const reducer = (state = initState, {type, payload}) => {
                 if (type === `spring/${ns}`) {
-                    const result = Object.create(prototype);
-                    assign(result, payload);
-                    return result;
+                    // @ts-ignore
+                    if(Object.setPrototypeOf) {
+                        // @ts-ignore
+                        Object.setPrototypeOf(payload, prototype);
+                        return payload;
+                    } else {
+                        const result = Object.create(prototype);
+                        assign(result, payload);
+                        return result;
+                    }
+
                 }
                 return state;
             };
