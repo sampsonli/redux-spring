@@ -174,17 +174,9 @@ export function service(ns: string):any {
             }
             const reducer = (state = initState, {type, payload}) => {
                 if (type === `spring/${ns}`) {
-                    // @ts-ignore
-                    if(Object.setPrototypeOf) {
-                        // @ts-ignore
-                        Object.setPrototypeOf(payload, prototype);
-                        return payload;
-                    } else {
-                        const result = Object.create(prototype);
-                        assign(result, payload);
-                        return result;
-                    }
-
+                    const result = Object.create(prototype);
+                    assign(result, payload);
+                    return result;
                 }
                 return state;
             };
