@@ -268,7 +268,6 @@ export const controller = service;
  * 创建模块
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
-export const model = service;
 
 /**
  * 初始化redux-spring

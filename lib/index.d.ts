@@ -43,12 +43,11 @@ export declare const autowired: typeof inject;
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
 export declare const controller: typeof service;
+declare const _default: (store: any, asyncReducers?: {}) => void;
 /**
  * 创建模块
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
-export declare const model: typeof service;
-declare const _default: (store: any, asyncReducers?: {}) => void;
 /**
  * 初始化redux-spring
  * @param store 需要注入的store
