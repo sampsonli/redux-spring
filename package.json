@@ -21,7 +21,8 @@
   "types": "lib/index.d.ts",
   "files": [
     "lib",
-    "src"
+    "src",
+    "doc"
   ],
   "peerDependencies": {
     "redux": ">=2.0.0",

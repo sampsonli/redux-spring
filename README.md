@@ -30,3 +30,7 @@ react-spring 基本理念参考了后端java 中spring概念， DI（依赖注�
  完美的解决了 当遇到多个顺序异步操作， 而且异步操作之间有数据修改的情况下可以把修改的数据同步到页面中，而不需要做额外的操作。
  
  > redux-spring 的优势远不止这些，这里只是列出了主要的优点，比如可读性好，学习成本低等等 
+
+1. [初始化](./doc/installation.md)
+2. [快速开始](./doc/guide/README.md)
+3. [API文档](./doc/api/README.md)

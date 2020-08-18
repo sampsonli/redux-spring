@@ -1,6 +1,6 @@
-import {Model, model, useModel} from './index'
+import {Model, service, useModel} from './index'
 
-@model('hello')
+
 class Test extends Model{
     name = 'lichun'
     getName() {
@@ -8,5 +8,6 @@ class Test extends Model{
     }
 
 }
+const t = service('hello')(Test)
 const test = useModel(Test);
 console.log(test.getName())

@@ -41,8 +41,8 @@ function assign(target, from) {
  * 创建模块
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
-export function service(ns: string):any {
-    return (Clazz) => {
+export function service(ns: string) {
+    return <T extends {new(...args: any[]): any}>(Clazz: T): T => {
         const Proxy = function (...args) {
             const instance = new Clazz(...args);
             const __wired = Clazz.prototype.__wired || {};
@@ -186,6 +186,7 @@ export function service(ns: string):any {
         Proxy.ns = ns;
         new Proxy();
         Proxy.prototype = allProto[ns];
+        // @ts-ignore
         return Proxy;
     };
 }
