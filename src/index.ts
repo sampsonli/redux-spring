@@ -42,11 +42,14 @@ function assign(target, from) {
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
 export function service(ns: string) {
-    return <T extends {new(...args: any[]): any}>(Clazz: T): T => {
+    return <T>(Clazz: T): T => {
         const Proxy = function (...args) {
+            // @ts-ignore
             const instance = new Clazz(...args);
+            // @ts-ignore
             const __wired = Clazz.prototype.__wired || {};
             const wiredList = Object.keys(__wired);
+            // @ts-ignore
             delete Clazz.prototype.__wired;
             if (!ns) {
                 throw new Error("please define 'ns' before");
@@ -67,8 +70,11 @@ export function service(ns: string) {
 
             const prototype = {ns};
             const _prototype = {ns};
+            // @ts-ignore
             Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
+                // @ts-ignore
                 if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
+                    // @ts-ignore
                     const origin = Clazz.prototype[key];
                     prototype[key] = function (...params) {
                         const _this = Object.create(_prototype);
@@ -128,6 +134,7 @@ export function service(ns: string) {
                     if (origin.prototype.toString() === '[object Generator]') {
                         _prototype[key] = prototype[key];
                     } else {
+                        // @ts-ignore
                         _prototype[key] = Clazz.prototype[key];
                     }
                 }
