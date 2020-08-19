@@ -2,7 +2,7 @@
  * 创建模块
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
-export declare function service(ns: string): any;
+export declare function service(ns: string): <T>(Clazz: T) => T;
 /**
  * react hooks 方式获取模块类实例
  * @param Class 模块类
