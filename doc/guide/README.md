@@ -41,6 +41,25 @@ export default HomeModel;
 5. num 类属性，所有类属性最终都会保存在redux的state中；
 6. ***注意*** 不管是普通方法，还是异步方法， 都不能定义为箭头方法， 否则会报错。
 7. ***注意*** 保留字 setData,reset, ns，不能用于方法名，属性名。 
+8. 对部分方法中有异步回调时候， 例如
+    ```js
+    @service('home')
+    class HomeModel extends Model {
+        num = 0;
+        init() {
+            ajax().then(resp => {
+                // this.num = resp; // 不能这么写， 否则会导致数据不会同步
+                this.setData({num: resp}) // 这样写可以确保对num的修改会同步到根state
+                // this.add() 此处调用this的同步方法也不行， 但是可以调用this 的异步方法
+    
+            });
+        }
+        add() {
+            this.num ++;
+        }
+    }
+    export default HomeModel;
+    ```
 
 ### 在页面使用 model
 - 使用react-hooks 写法
