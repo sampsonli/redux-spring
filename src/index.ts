@@ -193,8 +193,14 @@ export function service(ns: string) {
         Proxy.ns = ns;
         new Proxy();
         Proxy.prototype = allProto[ns];
+        if(typeof allProto[ns].created === 'function') {
+            allProto[ns].created();
+        }
         // @ts-ignore
-        return Proxy;
+        Clazz.ns = ns;
+        // @ts-ignore
+        Clazz.prototype = allProto[ns];
+        return Clazz;
     };
 }
 
