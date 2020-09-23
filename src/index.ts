@@ -83,8 +83,8 @@ export function service(ns: string) {
                                 const rootState = _store.getState();
                                 const state = rootState[ns];
                                 Object.keys(state).forEach((_key) => {
-                                    if (__wired[key]) {
-                                        _this[_key] = rootState[__wired[key]];
+                                    if (__wired[_key]) {
+                                        _this[_key] = rootState[__wired[_key]];
                                     } else {
                                         _this[_key] = state[_key];
                                     }
