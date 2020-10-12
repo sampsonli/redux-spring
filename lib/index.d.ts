@@ -2,7 +2,7 @@
  * 创建模块
  * @param ns 模块名称， 模块名称唯一， 不能有冲突
  */
-export declare function service(ns: string): <T>(Clazz: T) => T;
+export declare function service(ns: string): (Clazz: any) => any;
 /**
  * react hooks 方式获取模块类实例
  * @param Class 模块类
@@ -26,7 +26,7 @@ export declare function inject<T extends Model | Object>(Class: {
  */
 export declare function resource(ns: string): (clazz: any, attr: any) => void;
 /**
- * 基础模块， 最佳实践，每个模块都应继承基础模块
+ * 基础模块， 最佳实践，每个模块都应继承基础模块类
  */
 export declare class Model {
     static ns: string;
