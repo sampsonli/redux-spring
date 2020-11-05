@@ -34,7 +34,7 @@ class HomeModel extends Model {
 }
 export default HomeModel;
 ~~~
-1. @service('home') 定义一个模块， 每个模块必须添加此注解， 其中home 是自己给模块取的名称；
+1. @service('home') 定义一个模块， 每个模块必须添加此注解， 其中home 是自己给模块取的名称, 如果不想取名，也可直接用module.id；
 2. Model 是个接口， 主要是给model实例和模块类提供接口和属性api， Model定义可以参考[API说明](../api/README.md)；
 3. init() 是一个异步方法，在redux-spring中异步方法都是使用 generator方法， 不能用async/await;
 4. add() 是定义的普通方法；
@@ -63,7 +63,7 @@ export default HomeModel;
 
 ### 在页面使用 model
 - 使用react-hooks 写法
-```js
+```jsx
 import React, {useEffect} from 'react';
 import {useModel} from 'redux-spring';
 import style from './style.less';
@@ -98,7 +98,7 @@ export default () => {
 3. model中所有方法已经绑定过this了， 可以单独拿出来调用；
 
 - 使用类组件
-```js
+```jsx
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -109,7 +109,6 @@ import HomeModel from '../../models/HomeModel';
 class Home extends Component {
   render() {
     const {
-      /** @type HomeModel */
       model,
     } = this.props;
 
@@ -162,6 +161,7 @@ export default UserModel;
 
 ```js HomeModel.js
 @service('home')
+//@service(module.id) // 也可以直接使用模块标识
 class HomeModel extends Model {
     num = 0;
     username;
@@ -189,7 +189,7 @@ export default HomeModel;
 
 
 最后在页面中展示数据
-```js
+```jsx
 import React, {useEffect} from 'react';
 import {useModel} from 'redux-spring';
 import style from './style.less';
@@ -225,5 +225,5 @@ export default () => {
 
 
 ### 参考项目
-[reactwebpack4](https://github.com/sampsonli/reactwebpack4)
+整合最新react17+webpack5通用模板项目[react_template_project](https://github.com/sampsonli/react_template_project)
 
