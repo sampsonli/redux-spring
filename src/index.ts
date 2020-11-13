@@ -257,15 +257,7 @@ export class Model {
  * @param Class 模块类
  */
 export const autowired = inject;
-/**
- * 创建模块
- * @param ns 模块名称， 模块名称唯一， 不能有冲突
- */
-export const controller = service;
-/**
- * 创建模块
- * @param ns 模块名称， 模块名称唯一， 不能有冲突
- */
+
 
 /**
  * 初始化redux-spring
