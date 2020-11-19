@@ -3,24 +3,26 @@
 redux-spring 是一个专为 react + redux 应用程序进行的二次封装库， 解决了基于原生开发redux 遇到的各种问题。 同时提供新的开发理念。
 具有以下四大特点:
 1. 模块化
-2. 基于面向对象
+2. 面向对象
 3. 依赖注入
 4. 完美异步解决方案
 ### 模块化
-我们知道 基于原生redux开发， 一个模块中至少需要有 reducer， action， state， 还有各种常量，且分别定义在不同文件中， 在页面引入的时候
-还需要定义mapStateToProps/mapActionToProps 等等， 总之实现一个模块需要写大量与业务无关的代码， 可读性也不直观， 并且经常要在需要在不同文件来回切换
-，导致开发成本直线上升。
+我们知道 基于原生redux开发， 一个简单dispatch操作中至少需要定义 reducer， action， state， 还有常量，且分别定义在不同文件中， 并且在页面引入的时候
+还需要定义mapStateToProps/mapActionToProps 等方法， 总之实现一个dispatch需要写大量与业务无关的代码， 可读性也不友好， 并且经常要在需要在不同文件来回切换
+非常繁琐，导致开发成本直线上升。
 
-基于原生redux开发遇到的种种问题，redux-spring 引入模块化， 把之前state,reducer,action 整合到一起，定义为一个model， 通过各种封装，以及引入新开发思想，
-定义一个模块并不会因为整合了所有功能而导致代码量急剧上升。
+基于原生redux开发遇到的种种问题，redux-spring 引入模块概念， 把之前state,reducer,action 整合到一起，定义为一个model， 通过一系列封装，以及引入新的开发理念，
+定义一个模块并不会因为整合了所有功能模块而导致代码量急剧上升以及可读性变差。
 
 ### 面向对象
 面向对象带来的好处不言而喻，
- 总的来说， 在数据层面上，更适合基于面向对象开发，只需要把把重心关注数据处理， 而不需要过多关注页面展示， 甚至前端开发可以进一步拆分： “静态页面” 与 “数据处理”
-一套数据处理可以同时应用在多个场合，比如pc/h5。
-基于面向对象开发还可以带来一系列好处， 完美兼容typescript，很方便提供api文档， 不用再为原生redux开发找对应action/reducer而烦恼。
+ 总的来说， 在数据层面上，更适合基于面向对象开发，展示层面用方法组件而不是类组件， 再配合react hooks新特性，二者可以完美融合。
+ 我们可以把页面展示和数据流处理分离开来， 甚至前端开发可以进一步拆分： “静态页面” 与 “数据处理”
+一套数据流处理可以同时应用到多场合，比如pc/h5。
+此外， 完美支持typescript，很方便提供api文档， 不用再为原生redux开发找对应action/reducer而烦恼。
+
 ### 依赖注入
-react-spring 基本理念参考了后端java 中spring框架概念， DI（依赖注入）核心思想。 所有model都是单实例的，统一由框架创建与维护， 模块之间可以相互依赖， 由react-spring自动注入
+react-spring 基本理念参考了后端java 中spring框架， DI（依赖注入）核心思想。 所有model都是单实例的，统一由框架创建与维护， 模块之间可以相互依赖， 由react-spring自动注入
 用户只需通过注解标注类型即可，这样模块之间数据共享就变得特别方便。
 
 
@@ -74,39 +76,23 @@ class HomeModel extends Model {
         this.num ++;
     }
     // created() { // 如果定义了created方法，此方法在模块加载的时候会自动执行
-    
+    //
     //}
 }
 export default HomeModel;
 ~~~
 1. @service('home') 定义一个模块， 每个模块必须添加此注解， 其中home 是自己给模块取的名称, 如果不想取名，也可直接用module.id， 比如@service(module.id);
-2. Model 是个接口， 主要是给model实例和模块类提供接口和属性api， Model定义可以参考[API说明](./doc/api/README.md)；
-3. init() 是一个异步方法，在redux-spring中异步方法都是使用 generator方法， 不能用async/await;
-4. add() 是定义的普通方法；
-5. num 类属性，所有类属性最终都会保存在redux的state中；
-6. ***注意*** 不管是普通方法，还是异步方法， 都不能定义为箭头方法， 否则会报错。
-7. ***注意*** 保留字 setData,reset, ns，created不能用于自定义方法名，属性名。 
-8. 对部分方法中有异步回调时候， 例如
-    ```js
-    @service('home')
-    class HomeModel extends Model {
-        num = 0;
-        init() {
-            ajax().then(resp => {
-                // this.num = resp; // 不能这么写， 否则会导致数据不会同步
-                this.setData({num: resp}) // 这样写可以确保对num的修改会同步到根state
-                // this.add() 此处调用this的同步方法也不行， 但是可以调用异步方法
-    
-            });
-        }
-        add() {
-            this.num ++;
-        }
-    }
-    export default HomeModel;
-    ```
+2. redux-spring 大量依赖注解语法， 老版本babel需要相应插件；
+3. Model 是个接口， 主要是给model实例和类提供接口api和属性， Model定义可以参考[API说明](./doc/api/README.md)；
+4. init() 是一个异步方法，在redux-spring中异步方法都是基于 generator语法， 不能用async/await语法， generator和async/await使用方式一模一样；
+5. add() 是定义的普通类方法；
+6. num 类属性，所有类属性最终都会保存在redux的state中；
+7. ***注意*** 不管是普通方法，还是异步方法， 都不能定义为箭头方法， 否则会由于找不到this而报错。
+8. ***注意*** 保留字 setData,reset, ns，created不能用于自定义方法、属性名。 
+
 
 ### 在页面使用 model
+> 页面引入model同时支持类组件和方法组件，使用方法如下：
 - 使用react-hooks 写法
 ```jsx
 import React, {useEffect} from 'react';
@@ -180,14 +166,14 @@ Home.propTypes = {
 export default connect(state => ({model: state[HomeModel.ns]}))(Home);
 ```
 - 说明
-1. 所有model都挂载在根state下, 同时包含组件的类方法和属性；
-2. HomeModel.ns 模块定义的名称；
-3. 声明组件属性类型的时候建议用 PropTypes.instanceOf(类名);
-4. 类组件属性注入需要依赖 react-redux模块，而hooks写法不需要；
+1. 所有model都挂载在store的根state下；
+2. HomeModel.ns 模块定义的名称， 等同于@service('home') 中的'home';
+3. 声明组件属性类型的时候建议用 PropTypes.instanceOf(类名)；
+4. 类组件model注入需要依赖 react-redux模块，而hooks写法不需要；
 
 ### 高级用法
-#### 1. 依赖注入
-> 以上案例基本上可以满足绝大部分业务需求, 但是有时候我们定义了多个model， model之间需要有数据共享， 在redux-spring 引入了依赖注入（DI),
+#### 1. 依赖注入（DI)
+> 以上案例基本上可以满足绝大部分业务需求, 但是有时候我们定义了多个model， model之间需要有数据共享， 在redux-spring 引入了依赖注入（Dependency Inject),
 > 模块之间可以相互依赖， 我们不需要手动去注入， 框架会根据配置自动注入进来。举个例子，还是在上面的案例中， HomeModel 依赖另外
 >一个UserModel, UserModel 中定义了name 属性， HomeModel 初始化后拿到UserModel中的name,并展示在页面中
 
@@ -212,6 +198,7 @@ class HomeModel extends Model {
     username;
     
     /**
+     * 声明user类型
      * @type {UserModel}
      */
     @inject(UserModel) user;
@@ -228,9 +215,9 @@ export default HomeModel;
 ```
 - 说明
 1. @inject(UserModel)，给属性注入UserModel 实例
-2. 注入的实例，类方法中可以获取实例属性， 也可以调用注入实例的方法， 但是不能直接修改实例的属性， 只能通过方法去设置；
+2. 注入的实例，类方法中可以获取实例属性， 也可以调用注入实例的方法， 但是不能直接修改实例的属性， 只能通过setData方法或者类方法去设置；
 3. 被注入的属性前面建议加上jsDoc注释，表明属性类型，方便后续使用实例属性和方法；
-4. 页面中尽量不要直接引用被注入的属性，否则可能出现数据不同步的情况。注入的属性主要为了解决模块读取其他模块中数据功能。
+4. 页面中尽量不要直接引用被注入的属性，否则可能出现数据不同步的情况。注入的属性主要为了解决类方法获取其他模块中数据功能。
 
 
 最后在页面中展示数据
@@ -248,7 +235,7 @@ export default () => {
     useEffect(() => {
         model.init();
     }, []);
-    // model.user.name 可以读取， 但是不建议这样使用，否则可能导致数据不同步。
+    // model.user.name 可以读取， 但是不建议这样使用，否则可能导致数据不同步。如果不了解底层原理， 建议不要使用，哈哈
     return (
         <div className={style.container}>
             <div className={style.content}>
@@ -286,8 +273,11 @@ class CreatedModel extends Model {
 }
 export default CreatedModel;
 ```
+- 最佳实践是在模块类中定义init方法，然后放入组件的 React.useEffect方法中调用。
+
 #### 3. 快捷的操作model数据
-> 有时候页面中需要修改model中的数据， 如果只是修改少量数据，新定义一个方法会大大增加业务代码量， 可以使用 model.setData({})方法
+> 有时候页面中需要修改model中的数据， 如果只是修改少量数据，新定义一个方法会大大增加业务代码量， 可以使用 model.setData(params)方法
+>params是一个普通对象， key是要修改的属性名， value是修改后的值。
 ```jsx
 export default () => {
     const model = useModel(HomeModel);
@@ -301,7 +291,7 @@ export default () => {
     return (
         <div className={style.container}>
             <div className={style.content}>
-                <div className={style.addOne} onClick={model.setData({num: num + 1})}>
+                <div className={style.addOne} onClick={() => model.setData({num: num + 1})}>
                     +1
                 </div>
                 <div className={style.txt}>
@@ -315,7 +305,7 @@ export default () => {
     );
 };
 ```
-- 用 model.setData({num: num + 1}) 取代 model.add 方法， 可以减少许多代码量
+- 用 model.setData({num: num + 1}) 取代 model.add 方法， 可以减少许多代码量， 但是每次页面渲染都会生成一个新方法， 可能对性能优化不是很友好， 具体取舍看业务场景吧！
 
 #### 4. 重置model中的所有数据到初始值
 > 组件销毁的时候， 我们要清空现有的数据， 我们可以调用 model.reset；
@@ -333,7 +323,7 @@ export default () => {
     return (
         <div className={style.container}>
             <div className={style.content}>
-                <div className={style.addOne} onClick={model.setData({num: num + 1})}>
+                <div className={style.addOne} onClick={() => model.setData({num: num + 1})}>
                     +1
                 </div>
                 <div className={style.txt}>
@@ -346,6 +336,51 @@ export default () => {
         </div>
     );
 };
+```
+### 5. 异步方法回调不能直接通过this 修改类属性
+> 有两种解决方案， 一种是直接通过setData 方法修改属性， 另外一种是通过初始化promise实例方案， 建议采用后者；
+- 直接修改
+```js
+@service(module.id)
+class HomeModel extends Model {
+   num = 0;
+   getDataByJQuery() {
+       $.ajax({
+            url: 'xxx',
+            method: 'get',
+            success: (resp) => {
+                // this.num = resp; 直接修改num属性不生效
+                this.setData({num: resp}) // 可以通过直接调用setData方法来更新数据
+            }
+       })
+   }
+   add() {
+       this.num ++;
+   }
+}
+export default HomeModel;
+```
+- 初始化promise实例
+```js
+@service(module.id)
+class HomeModel extends Model {
+   num = 0;
+   * getDataByJQuery() {
+        this.num = yield new Promise((resolve) => {
+            $.ajax({
+                url: 'xxx',
+                method: 'get',
+                success: (resp) => {
+                    resolve(resp);
+                }
+            });
+        });
+   }
+   add() {
+       this.num ++;
+   }
+}
+export default HomeModel;
 ```
 ### 最佳实践
 #### 1. 应用场景
