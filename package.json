@@ -1,6 +1,6 @@
 {
   "name": "redux-spring",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "description": "react spring redux 模块化 依赖注入",
   "author": "sampsonli",
   "keywords": [
@@ -9,7 +9,9 @@
     "spring",
     "依赖注入",
     "按需加载",
-    "模块化"
+    "模块化",
+    "ts redux",
+    "ts react redux"
   ],
   "homepage": "https://github.com/sampsonli/redux-spring",
   "license": "MIT",
@@ -32,8 +34,8 @@
     "@types/jest": "^26.0.15",
     "jest": "^26.6.3",
     "react": ">=0.14.0",
-    "redux": "^2.0.0",
+    "redux": "^4.0.5",
     "ts-jest": "^26.4.4",
-    "typescript": "^3.5.2"
+    "typescript": "^3.9.7"
   }
 }

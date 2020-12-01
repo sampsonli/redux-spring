@@ -12,22 +12,17 @@ test('test class function', () => {
         add(count) {
             this.num = this.num + count;
         }
-        * getFromRemote() {
-            this.result = yield new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(12);
-                }, 1000);
-            });
-            return this.result;
-        }
     }
-    let model = store.getState().test;
+    // @ts-ignore
+    let model = <Test> store.getState().test
 
     expect(model.num).toBe(0);
     model.add(10);
-    model = store.getState().test;
+    // @ts-ignore
+    model = <Test> store.getState().test
     expect(model.num).toBe(10);
     model.add(10);
-    model = store.getState().test;
+    // @ts-ignore
+    model = <Test> store.getState().test
     expect(model.num).toBe(20);
 })
