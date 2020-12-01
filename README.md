@@ -1,4 +1,5 @@
 # redux-spring 是什么？
+[![Build Status](https://travis-ci.org/sampsonli/redux-spring.svg?branch=master)](https://travis-ci.org/sampsonli/redux-spring)
 
 redux-spring 是一个专为 react + redux 应用程序进行的二次封装库， 解决了基于原生开发redux 遇到的各种问题。 同时提供新的开发理念。
 具有以下四大特点:
