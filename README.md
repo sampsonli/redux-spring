@@ -2,7 +2,8 @@
 [![Build Status](https://travis-ci.org/sampsonli/redux-spring.svg?branch=master)](https://travis-ci.org/sampsonli/redux-spring)
 [![npm version](https://img.shields.io/npm/v/redux-spring.svg?style=flat)](https://www.npmjs.com/package/redux-spring) 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sampsonli/redux-spring/blob/master/LICENSE)
-redux-spring 是一个专为 react + redux 应用程序进行的二次封装库， 解决了基于原生开发redux 遇到的各种问题。 同时提供新的开发理念。
+----
+redux-spring 是一个专为 react + redux 应用程序进行的二次封装库， 解决了基于原生开发redux 遇到的各种问题, 同时提供新的开发理念,
 具有以下四大特色:
 1. 模块化
 2. 面向对象
@@ -55,15 +56,15 @@ import store from './store'; // redux.createStore() 返回来的实例
 spring(store);
 ~~~
 1. 此处目的是给redux-spring注入store,底层很多操作都是基于store这个实例进行操作的；
-2. ***注意*** 初始化逻辑必须在导入模块之前， 否则导入模块的时候会报错；
-3. 如果要和老项目无缝集成可以传入第二个参数
+2. ***<font color="red">注意</font>*** 初始化逻辑必须在导入模块之前， 否则导入模块的时候会报错；
+3. 如果要和老项目无缝集成可以传入第二个参数。
 ```js
 spring(store, asycReudcers); // asyncReducers 是老项目中的所有reducer（数组类型） 集合
 ```
 
 ### 2. 定义模块类
 ~~~js
-import {service} from 'redux-spring';
+import {service, Model} from 'redux-spring';
 function ajax() { // 模拟ajax请求
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -184,7 +185,7 @@ export default connect(state => ({model: state[HomeModel.ns]}))(Home);
 ### 1. 依赖注入（DI)
 > 以上案例基本上可以满足绝大部分业务需求, 但是有时候我们定义了多个model， model之间需要有数据共享， 在redux-spring 引入了依赖注入（Dependency Inject),
 > 模块之间可以相互依赖， 我们不需要手动去注入， 框架会根据配置自动注入进来。举个例子，还是在上面的案例中， HomeModel 依赖另外
->一个UserModel, UserModel 中定义了name 属性， HomeModel 初始化后拿到UserModel中的name,并展示在页面中
+> 一个UserModel, UserModel 中定义了name 属性， HomeModel 初始化后拿到UserModel中的name,并展示在页面中;
 
 ```js UserModel.js
 import {Model, service} from 'redux-spring';
@@ -200,6 +201,7 @@ export default UserModel;
 
 
 ```js HomeModel.js
+import UserModel from './UserModel';
 @service('home')
 //@service(module.id) // 也可以直接使用模块标识
 class HomeModel extends Model {
@@ -211,10 +213,12 @@ class HomeModel extends Model {
      * @type {UserModel}
      */
     @inject(UserModel) user;
+
     * init() {
         this.num = yield ajax();
         this.username = this.user.name;
     }
+
     add() {
         this.num ++;
     }
@@ -227,6 +231,7 @@ export default HomeModel;
 2. 注入的实例，类方法中可以获取实例属性， 也可以调用注入实例的方法， 但是不能直接修改实例的属性， 只能通过setData方法或者类方法去设置；
 3. 被注入的属性前面建议加上jsDoc注释，表明属性类型，方便后续使用实例属性和方法；
 4. 页面中尽量不要直接引用被注入的属性，否则可能出现数据不同步的情况。注入的属性主要为了解决类方法获取其他模块中数据功能。
+5. ***注意*** 在使用被注入的模块的属性前， 一定要确保被注入的模块的属性有值。
 
 
 最后在页面中展示数据
@@ -274,7 +279,7 @@ class CreatedModel extends Model {
         // this.ajaxGet()// 不能调用模块中的方法
     }
     ajaxGet() {
-    
+        // 方法逻辑
     }   
     created() { // 如果定义了created方法，此方法在模块加载的时候会自动执行
         thia.ajaxGet() // 此方法中可以调用模块中的方法进行初始化
@@ -282,9 +287,9 @@ class CreatedModel extends Model {
 }
 export default CreatedModel;
 ```
-- 最佳实践是在模块类中定义init方法，然后放入组件的 React.useEffect方法中调用。
+- 最佳实践， 减少created方法使用， 在模块类中定义init方法，然后放入组件的 React.useEffect方法中调用。
 
-### 3. 快捷的操作model数据
+### 3. 快捷的操作model中的数据
 > 有时候页面中需要修改model中的数据， 如果只是修改少量数据，新定义一个方法会大大增加业务代码量， 可以使用 model.setData(params)方法
 > params是一个普通对象， key是要修改的属性名， value是修改后的值。
 ```jsx
@@ -314,7 +319,7 @@ export default () => {
     );
 };
 ```
-- 用 model.setData({num: num + 1}) 取代 model.add 方法， 可以减少许多代码量， 但是每次页面渲染都会生成一个新方法， 可能对性能优化不是很友好， 具体取舍看业务场景吧！
+- 用 model.setData({num: num + 1}) 取代 model.add 方法， 可以减少模块定义的代码量， 但是缺点是每次页面渲染都会生成一个新方法， 可能对性能优化不是很友好， 具体取舍看业务场景吧！
 
 ### 4. 重置model中的所有数据到初始值
 > 组件销毁的时候， 我们要清空现有的数据， 我们可以调用 model.reset；
@@ -358,7 +363,7 @@ class HomeModel extends Model {
             url: 'xxx',
             method: 'get',
             success: (resp) => {
-                // this.num = resp; 直接修改num属性不生效
+                // this.num = resp; // 直接修改num属性不生效
                 this.setData({num: resp}) // 可以通过直接调用setData方法来更新数据
             }
        })
@@ -369,7 +374,7 @@ class HomeModel extends Model {
 }
 export default HomeModel;
 ```
-- 初始化promise实例
+- 封装promise实例
 ```js
 @service(module.id)
 class HomeModel extends Model {
@@ -402,11 +407,12 @@ export default HomeModel;
 
 ## 自己构建
 如果需要定制api GitHub 上克隆代码并自己构建。
-
+```shell
 git clone https://github.com/sampsonli/redux-spring node_modules/redux-spring
 cd node_modules/redux-spring
 npm install
 npm run build
+```
 ## 参考项目
 一个整合最新react17+webpack5通用模板项目[react_template_project](https://github.com/sampsonli/react_template_project)
 
