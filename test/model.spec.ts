@@ -17,12 +17,10 @@ describe('model function and props test', function () {
 
         expect(model.num).toBe(0);
         model.add(10);
-        // @ts-ignore
-        model = <Test> store.getState()[modelName];
+        model = <TestModel> store.getState()[modelName];
         expect(model.num).toBe(10);
         model.add(11);
-        // @ts-ignore
-        model = <Test> store.getState()[modelName];
+        model = <TestModel> store.getState()[modelName];
         expect(model.num).toBe(21);
     });
 
@@ -81,5 +79,33 @@ describe('model function and props test', function () {
         expect(model.num).toBe(0);
         expect(model.num2).toBe(2);
 
+    });
+    it('test model data update', () => {
+        const store = createStore(() => {
+        });
+        spring(store);
+        const modelName = 'test model data update'
+
+        @service(modelName)
+        class TestModel extends Model {
+            num = 0;
+            setNum(num) {
+                this.num = num;
+            }
+        }
+
+        let model = <TestModel>store.getState()[modelName];
+        expect(model.num).toBe(0);
+        model.setNum(1);
+        expect(store.getState()[modelName]).not.toEqual(model);
+        model = <TestModel>store.getState()[modelName];
+        model.setNum(1);
+        expect(store.getState()[modelName]).toEqual(model);
+        model = <TestModel>store.getState()[modelName];
+        model.setData({num: 1});
+        expect(store.getState()[modelName]).toEqual(model);
+        model = <TestModel>store.getState()[modelName];
+        model.setData({num: 2});
+        expect(store.getState()[modelName]).not.toEqual(model);
     });
 })

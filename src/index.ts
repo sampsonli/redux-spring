@@ -161,11 +161,10 @@ export function service(ns: string) {
         const rootState = _store.getState() || {};
         const finalInstance = rootState[ns] ? rootState[ns] : instance;
         Object.getOwnPropertyNames(instance).forEach(key => {
-            if (__wired[key]) {
-                initState[key] = rootState[__wired[key]];
-                return;
-            }
             initState[key] = finalInstance[key];
+        });
+        wiredList.forEach(key => {
+            initState[key] = rootState[__wired[key]];
         });
         if(rootState[ns]) { // 热更新时候用得到
             rootState[ns] = initState;
