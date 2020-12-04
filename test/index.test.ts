@@ -30,7 +30,7 @@ test('test class function', () => {
 test('test created function', () => {
     const store = createStore(() => {});
     spring(store);
-    @service('test')
+    @service('test_created')
     class Test extends Model {
         num = 0;
         created() {
@@ -38,7 +38,7 @@ test('test created function', () => {
         }
     }
     // @ts-ignore
-    let model = <Test> store.getState().test
+    let model = <Test> store.getState().test_created
 
     expect(model.num).toBe(11);
 })
