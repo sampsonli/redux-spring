@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import {useState, useEffect} from 'react';
+import {assign, isGenerator} from "./util";
 
 declare var Promise
 let _store;
@@ -19,34 +20,17 @@ function injectReducer(key, reducer) {
 // 保存所有模块的原型
 const allProto = {};
 
-function assign(target, from) {
-    // @ts-ignore
-    if (Object.assgin) return Object.assign(...arguments); // 现代浏览器赋值
-    const to = Object(target);
-    for (let index = 1; index < arguments.length; index++) {
-        const nextSource = arguments[index];
-
-        if (nextSource !== null && nextSource !== undefined) {
-            for (const nextKey in nextSource) {
-                // Avoid bugs when hasOwnProperty is shadowed
-                if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                    to[nextKey] = nextSource[nextKey];
-                }
-            }
-        }
-    }
-    return to;
-}
 
 /**
  * 创建模块
- * @param ns 模块名称， 模块名称唯一， 不能有冲突
+ * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
 export function service(ns: string) {
     return (Clazz) => {
         if (!ns) {
             throw new Error("please define 'ns' before");
         }
+        const TYPE = `spring/${ns}`;
         const instance = new Clazz();
         const __wired = Clazz.prototype.__wired || {};
         const wiredList = Object.keys(__wired);
@@ -60,19 +44,24 @@ export function service(ns: string) {
             if (diff) {
                 wiredList.forEach(key => {
                     newState[key] = rootState[__wired[key]];
-                })
-                _store.dispatch({type: `spring/${ns}`, payload: newState});
+                });
+                _store.dispatch({type: TYPE, payload: newState});
             }
         }
 
+        // 给外面用的原型对象
         const prototype = {ns, setData: undefined, reset:undefined, created: undefined};
+
+        // 给内部用的原型对象
         const _prototype = {ns, setData: undefined, reset:undefined};
+
         Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
             if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
                 const origin = Clazz.prototype[key];
+                const isGen = isGenerator(origin); // 是否是generator方法
                 prototype[key] = function (...params) {
                     const _this = Object.create(_prototype);
-                    if (origin.prototype.toString() === '[object Generator]') {
+                    if (isGen) { // 如果当前方法是generator方法
                         const runGen = (ge, val, isError, e) => {
                             const rootState = _store.getState();
                             const state = rootState[ns];
@@ -103,19 +92,20 @@ export function service(ns: string) {
                             }
                             return runGen(ge, tmp.value, false, null);
                         };
+                        // 异步方法必须异步执行
                         return Promise.resolve().then(() => runGen(origin.bind(_this)(...params), null, false, null));
                     }
                     const rootState = _store.getState();
                     const state = rootState[ns];
                     Object.keys(state).forEach(_key => {
-                        if (__wired[_key]) {
+                        if (__wired[_key]) { // 更新注入的模块实例
                             _this[_key] = rootState[__wired[_key]];
                         } else {
                             _this[_key] = state[_key];
                         }
                     });
                     const result = origin.bind(_this)(...params);
-                    if (result && typeof result.then === 'function') {
+                    if (result && typeof result.then === 'function') { // 如果返回来的是promise, 对数据进行同步， 此处可以兼容大部分async/await方法
                         doUpdate(_this);
                         return result.then(data => {
                             doUpdate(_this);
@@ -125,10 +115,10 @@ export function service(ns: string) {
                     doUpdate(_this);
                     return result;
                 };
-                if (origin.prototype.toString() === '[object Generator]') {
+                if (isGen) { // 解决异步方法嵌套调用问题
                     _prototype[key] = prototype[key];
                 } else {
-                    _prototype[key] = Clazz.prototype[key];
+                    _prototype[key] = origin;
                 }
             }
         });
@@ -137,14 +127,14 @@ export function service(ns: string) {
          * 设置模块数据
          * @param props， 要设置属性的集合， 为普通对象，比如 {a: 1, b:2}, 代表设置模块中a属性为1， b属性为2
          */
-        prototype.setData = function (props) {
+        prototype.setData = function (props: Object) {
             const state = _store.getState()[ns];
             const keys = Object.keys(props);
             if (keys.some(key => props[key] !== state[key])) {
-                _store.dispatch({type: `spring/${ns}`, payload: {...state, ...props}});
+                _store.dispatch({type: TYPE, payload: {...state, ...props}});
             }
         };
-        _prototype.setData = prototype.setData;
+        _prototype.setData = prototype.setData; // 模块内部也支持 调用setData方法
 
         const initState = Object.create(prototype);
 
@@ -155,7 +145,7 @@ export function service(ns: string) {
             wiredList.forEach(key => {
                 initState[key] = rootState[__wired[key]];
             })
-            _store.dispatch({type: `spring/${ns}`, payload: initState});
+            _store.dispatch({type: TYPE, payload: initState});
         };
         _prototype.reset = prototype.reset;
         const rootState = _store.getState() || {};
@@ -170,7 +160,7 @@ export function service(ns: string) {
             rootState[ns] = initState;
         }
         const reducer = (state = initState, {type, payload}) => {
-            if (type === `spring/${ns}`) {
+            if (type === TYPE) {
                 const result = Object.create(prototype);
                 assign(result, payload);
                 return result;
@@ -184,7 +174,7 @@ export function service(ns: string) {
         }
         allProto[ns] = prototype;
         Clazz.ns = ns;
-        Clazz.prototype = allProto[ns];
+        Clazz.prototype = prototype; // 覆盖初始原型对象
         return Clazz;
     };
 }
@@ -193,9 +183,9 @@ export function service(ns: string) {
  * react hooks 方式获取模块类实例
  * @param Class 模块类
  */
-export const useModel = <T extends Model | Object>(Class: { new(): T }): T => {
+export const useModel = <T extends Model>(Class: { new(): T }): T => {
     // @ts-ignore
-    const ns = Class.ns || Class;
+    const ns = Class.ns;
     const [data, setData] = useState(() => _store.getState()[ns]);
     useEffect(() => _store.subscribe(() => {
         const ret = _store.getState()[ns];
@@ -205,19 +195,10 @@ export const useModel = <T extends Model | Object>(Class: { new(): T }): T => {
     return data;
 };
 /**
- * 重置模块数据
- * @param Class 模块类|模块名称
- */
-export const resetModel = <T extends Model | Object>(Class: { new(): T } | string) => {
-    // @ts-ignore
-    const ns = Class.ns || Class;
-    allProto[ns].reset();
-};
-/**
  * 按照类型自动注入Model实例
  * @param {Model} Class --模块类
  */
-export function inject<T extends Model | Object>(Class: { new(): T }) {
+export function inject<T extends Model>(Class: { new(): T }) {
     // @ts-ignore
     const ns = Class.ns;
     return (clazz, attr) => {
@@ -253,11 +234,6 @@ export class Model {
         return;
     }
 }
-/**
- * 按照类型自动注入Model实例
- * @param Class 模块类
- */
-export const autowired = inject;
 
 
 /**

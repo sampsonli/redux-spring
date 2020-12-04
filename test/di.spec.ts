@@ -1,4 +1,4 @@
-import spring, {inject, Model, service} from '../src'
+import spring, {inject, Model, resource, service} from '../src'
 import {createStore} from 'redux';
 
 describe('model dependency inject test', function () {
@@ -17,11 +17,16 @@ describe('model dependency inject test', function () {
             getUser() {
                 return this.user;
             }
+            @resource(userModelName) user2;
+            getUser2() {
+                return this.user2;
+            }
         }
 
         let model = <TestModel> store.getState()[modelName]
         let userModel = <UserModel> store.getState()[userModelName]
 
         expect(model.getUser()).toEqual(userModel);
+        expect(model.getUser2()).toEqual(userModel);
     });
 })
