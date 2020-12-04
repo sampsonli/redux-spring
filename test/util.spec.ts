@@ -4,10 +4,10 @@ import {isGenerator, assign
 describe('util function test', function () {
     it('test isGenerator', () => {
        function *test(){
-           console.log('1111')
            yield 0;
        }
-       function test2(){}
+       function test2(){
+       }
        expect(isGenerator(test)).toBeTruthy();
        expect(isGenerator(test2)).toBeFalsy();
     });

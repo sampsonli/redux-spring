@@ -5,8 +5,7 @@
     "sourceMap": true,
     "declaration": true,
     "outDir": "lib",
-    "experimentalDecorators": true,
-    "lib": ["es2015.generator"]
+    "experimentalDecorators": true
   },
   "include": [
     "src/**/*"

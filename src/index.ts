@@ -2,7 +2,6 @@ import {combineReducers} from 'redux';
 import {useState, useEffect} from 'react';
 import {assign, isGenerator} from "./util";
 
-declare var Promise
 let _store;
 let _asyncReducers = {};
 
@@ -86,6 +85,7 @@ export function service(ns: string) {
                             doUpdate(_this);
                             if (tmp.done) {
                                 return tmp.value;
+                                // return Promise.resolve(tmp.value);
                             }
                             if (tmp.value && tmp.value.then) {
                                 return tmp.value.then(data => runGen(ge, data, false, null)).catch(error => runGen(ge, null, true, error));
