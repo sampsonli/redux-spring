@@ -9,7 +9,7 @@ describe('init redux-spring and register model class', function () {
         }).toThrow();
         expect(() => {
             spring(store);
-            spring(store, {});
+            service('test model')(class TestModel extends Model {});
         }).not.toThrow();
         expect(() => {
             spring(store, {});

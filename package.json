@@ -5,13 +5,13 @@
   "author": "sampsonli",
   "keywords": [
     "react",
-    "redux",
-    "spring",
+    "redux 模块",
+    "react redux",
+    "react spring",
     "依赖注入",
     "按需加载",
     "模块化",
-    "ts redux",
-    "ts react redux"
+    "ts redux"
   ],
   "homepage": "https://github.com/sampsonli/redux-spring",
   "license": "MIT",
