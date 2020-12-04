@@ -26,3 +26,19 @@ test('test class function', () => {
     model = <Test> store.getState().test
     expect(model.num).toBe(20);
 })
+
+test('test created function', () => {
+    const store = createStore(() => {});
+    spring(store);
+    @service('test')
+    class Test extends Model {
+        num = 0;
+        created() {
+            this.num = 11;
+        }
+    }
+    // @ts-ignore
+    let model = <Test> store.getState().test
+
+    expect(model.num).toBe(11);
+})

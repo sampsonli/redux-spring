@@ -5,6 +5,7 @@ declare var Promise
 let _store;
 let _asyncReducers = {};
 
+// 注入模块对应的reducer
 function injectReducer(key, reducer) {
     if (_store) {
         _asyncReducers[key] = reducer;
@@ -15,12 +16,12 @@ function injectReducer(key, reducer) {
         throw new Error('spring is not initialized, please invoke "spring(store)" before');
     }
 }
-
+// 保存所有模块的原型
 const allProto = {};
 
 function assign(target, from) {
     // @ts-ignore
-    if (Object.assgin) return Object.assign(...arguments);
+    if (Object.assgin) return Object.assign(...arguments); // 现代浏览器赋值
     const to = Object(target);
     for (let index = 1; index < arguments.length; index++) {
         const nextSource = arguments[index];
@@ -64,7 +65,7 @@ export function service(ns: string) {
             }
         }
 
-        const prototype = {ns, setData: undefined, reset:undefined};
+        const prototype = {ns, setData: undefined, reset:undefined, created: undefined};
         const _prototype = {ns, setData: undefined, reset:undefined};
         Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
             if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
@@ -178,10 +179,11 @@ export function service(ns: string) {
             return state;
         };
         injectReducer(ns, reducer);
-        allProto[ns] = prototype;
-        if(typeof allProto[ns].created === 'function') {
-            allProto[ns].created();
+        // 初始化提供created 方法调用, 热更新不重复调用
+        if(typeof prototype.created === 'function' && !allProto[ns]) {
+            prototype.created();
         }
+        allProto[ns] = prototype;
         Clazz.ns = ns;
         Clazz.prototype = allProto[ns];
         return Clazz;
@@ -214,7 +216,7 @@ export const resetModel = <T extends Model | Object>(Class: { new(): T } | strin
 };
 /**
  * 按照类型自动注入Model实例
- * @param Class 模块类
+ * @param {Model} Class --模块类
  */
 export function inject<T extends Model | Object>(Class: { new(): T }) {
     // @ts-ignore
@@ -229,7 +231,7 @@ export function inject<T extends Model | Object>(Class: { new(): T }) {
 
 /**
  * 按照模块名自动注入Model实例
- * @param ns 模块名称
+ * @param {string} ns --模块名称
  */
 export function resource(ns: string) {
     return (clazz, attr) => {
@@ -261,8 +263,8 @@ export const autowired = inject;
 
 /**
  * 初始化redux-spring
- * @param store 需要注入的store
- * @param asyncReducers 兼容老reducer集合
+ * @param store --需要注入的store
+ * @param asyncReducers --兼容老reducer集合
  */
 export default (store, asyncReducers = {}) => {
     _store = store;

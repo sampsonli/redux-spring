@@ -15,14 +15,14 @@ export declare const useModel: <T extends Object | Model>(Class: new () => T) =>
 export declare const resetModel: <T extends Object | Model>(Class: string | (new () => T)) => void;
 /**
  * 按照类型自动注入Model实例
- * @param Class 模块类
+ * @param {Model} Class --模块类
  */
 export declare function inject<T extends Model | Object>(Class: {
     new (): T;
 }): (clazz: any, attr: any) => void;
 /**
  * 按照模块名自动注入Model实例
- * @param ns 模块名称
+ * @param {string} ns --模块名称
  */
 export declare function resource(ns: string): (clazz: any, attr: any) => void;
 /**
@@ -41,7 +41,7 @@ export declare const autowired: typeof inject;
 declare const _default: (store: any, asyncReducers?: {}) => void;
 /**
  * 初始化redux-spring
- * @param store 需要注入的store
- * @param asyncReducers 兼容老reducer集合
+ * @param store --需要注入的store
+ * @param asyncReducers --兼容老reducer集合
  */
 export default _default;
