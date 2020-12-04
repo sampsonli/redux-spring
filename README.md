@@ -180,8 +180,8 @@ export default connect(state => ({model: state[HomeModel.ns]}))(Home);
 3. 声明组件属性类型的时候建议用 PropTypes.instanceOf(类名)；
 4. 类组件model注入需要依赖 react-redux模块的Provider，而hooks写法不需要；
 
-### 高级用法
-#### 1. 依赖注入（DI)
+## 高级用法
+### 1. 依赖注入（DI)
 > 以上案例基本上可以满足绝大部分业务需求, 但是有时候我们定义了多个model， model之间需要有数据共享， 在redux-spring 引入了依赖注入（Dependency Inject),
 > 模块之间可以相互依赖， 我们不需要手动去注入， 框架会根据配置自动注入进来。举个例子，还是在上面的案例中， HomeModel 依赖另外
 >一个UserModel, UserModel 中定义了name 属性， HomeModel 初始化后拿到UserModel中的name,并展示在页面中
@@ -263,7 +263,7 @@ export default () => {
 };
 ```
 - 注意： 页面中可以直接使用model注入的user,绝大多数情况下没问题， 如果遇到其他模块修改UserModel中的数据， 会导致当前组件中的数据不能及时同步。
-#### 2. 初始化方法
+### 2. 初始化方法
 > 有时候会遇到这种场景， 模块加载的时候进行一些初始化操作， 初始化操作可以定义created方法来实现
 ```js
 @service(module.id)
@@ -284,9 +284,9 @@ export default CreatedModel;
 ```
 - 最佳实践是在模块类中定义init方法，然后放入组件的 React.useEffect方法中调用。
 
-#### 3. 快捷的操作model数据
+### 3. 快捷的操作model数据
 > 有时候页面中需要修改model中的数据， 如果只是修改少量数据，新定义一个方法会大大增加业务代码量， 可以使用 model.setData(params)方法
->params是一个普通对象， key是要修改的属性名， value是修改后的值。
+> params是一个普通对象， key是要修改的属性名， value是修改后的值。
 ```jsx
 export default () => {
     const model = useModel(HomeModel);
@@ -316,7 +316,7 @@ export default () => {
 ```
 - 用 model.setData({num: num + 1}) 取代 model.add 方法， 可以减少许多代码量， 但是每次页面渲染都会生成一个新方法， 可能对性能优化不是很友好， 具体取舍看业务场景吧！
 
-#### 4. 重置model中的所有数据到初始值
+### 4. 重置model中的所有数据到初始值
 > 组件销毁的时候， 我们要清空现有的数据， 我们可以调用 model.reset；
 ```jsx
 export default () => {
@@ -391,22 +391,22 @@ class HomeModel extends Model {
 }
 export default HomeModel;
 ```
-### 最佳实践
-#### 1. 应用场景
+## 最佳实践
+### 1. 应用场景
 > redux-spring 非常适用于具有复杂交互逻辑的页面/组件， 或者页面之间有数据交互/共享等场景
 > 不适用于循环列表项中的复杂组件
-#### 2. ui展示层与数据分离
+### 2. ui展示层与数据分离
 >页面展示和数据可以进一步拆分， 页面中不包含任何逻辑处理， 数据层完全基于model
 >以面向对象的方式进行开发， 对外提供api接口和数据文档，并且一份model可以适配多平台，比如同时适配移动端h5 和pc端页面， 
 >多人协作的时候， 可以ui 和数据完全交给不同人负责，高效完成需求， 同时可以保证代码风格统一。
 
-### 自己构建
+## 自己构建
 如果需要定制api GitHub 上克隆代码并自己构建。
 
 git clone https://github.com/sampsonli/redux-spring node_modules/redux-spring
 cd node_modules/redux-spring
 npm install
 npm run build
-### 参考项目
+## 参考项目
 一个整合最新react17+webpack5通用模板项目[react_template_project](https://github.com/sampsonli/react_template_project)
 
