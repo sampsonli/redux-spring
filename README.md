@@ -374,6 +374,7 @@ class HomeModel extends Model {
 }
 export default HomeModel;
 ```
+
 - 封装promise实例
 ```js
 @service(module.id)
@@ -396,6 +397,48 @@ class HomeModel extends Model {
 }
 export default HomeModel;
 ```
+
+### 6. 同一个模块中异步方法可以相互调用
+> 假设有如下复杂场景， 同步方法init调用异步方法A, 异步方法A中顺序调用异步方法B, C, ..., 异步方法C 中调用同步方法D
+
+```js
+@service(module.id)
+class AsyncModel extends Model {
+    init() {
+        this.ajaxA();
+    }
+   * ajaxA() { // 顺序执行异步b,c, promise;
+        const ret = yield this.ajaxB(); // 可以有返回值
+        console.log(ret) // 123;
+        yield this.ajaxC();
+        yield Promise.resolve(22);
+   }
+   * ajaxB() {
+       // async body, 可以获取和设置this中的属性
+      return 123
+   }
+   * ajaxC() {
+       // async body, 可以获取和设置this中的属性
+        this.syncD();
+        // async body;
+        // yield this.ajaxE(); // 可以直接调用异步E方法。
+   }
+    syncD() {
+       // body
+    }
+    async ajaxE() {
+        // await promise;
+        // async body
+    }
+
+}
+export default AsyncModel;
+
+```
+1. 模块中的同步方法可以理解为一个返回promise 实例的方法；
+2. 异步方法每执行一步yield， 所有数据修改都会同步到页面；
+3. 如果不太关心执行过程中的数据同步问题， 可以用async/await 替换generator方法。不过不建议这样做。
+
 ## 最佳实践
 ### 1. 应用场景
 > redux-spring 非常适用于具有复杂交互逻辑的页面/组件， 或者页面之间有数据交互/共享等场景
