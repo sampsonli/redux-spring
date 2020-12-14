@@ -1,8 +1,8 @@
 import spring, {inject, Model, resource, service} from '../src'
 import {createStore} from 'redux';
 
-describe('model dependency inject test', function () {
-    it('test model di', () => {
+describe('model async function test', function () {
+    it('test model async func', () => {
         const store = createStore(() => {});
         spring(store);
         const modelName = 'test model async 1'
@@ -28,6 +28,39 @@ describe('model dependency inject test', function () {
             expect(name).toBe(19);
             model = <UserModel> store.getState()[modelName];
             expect(model.name).toBe(19);
+        })
+    });
+
+    it('test complex function', () => {
+        const store = createStore(() => {});
+        spring(store);
+        const modelName = 'complex function'
+        @service(modelName)
+        class UserModel extends Model {
+            num = 1;
+            * setNum() {
+                this.num = 2;
+                this.ajax();
+                this.num = yield this.ajax();
+            }
+            * ajax() {
+                const num = this.num;
+                yield new Promise((resolve) => {
+                    // resolve(19);
+                    setTimeout(() => {
+                        resolve(19)
+                    }, 11)
+                })
+                return num;
+            }
+        }
+
+
+        let model = <UserModel> store.getState()[modelName];
+        expect(model.num).toBe(1);
+        // @ts-ignore
+        model.setNum().then((num) => {
+            expect(num).toBe(2);
         })
     });
 })
