@@ -435,9 +435,41 @@ class AsyncModel extends Model {
 export default AsyncModel;
 
 ```
-1. 模块中的同步方法可以理解为一个返回promise 实例的方法；
+1. 模块中所有异步方法可以理解为一个返回promise 实例的方法；
 2. 异步方法每执行一步yield， 所有数据修改都会同步到页面；
 3. 如果不太关心执行过程中的数据同步问题， 可以用async/await 替换generator方法。不过不建议这样做。
+
+### 7. 异步方法异常处理
+> 以上案例均是正常处理逻辑，没有出任何异常情况， 但是实际开发中， 异常处理是避免不了的， redux-spring 对异常处理有比较好的支持。其用法和async/await 一致。比如：
+```js
+@service(module.id)
+class ExceptionModel extends Model {
+    init() {
+        this.ajaxA();
+        this.ajaxB().then((ret) => {
+            console.log('success') // 此处不会执行
+        }).catch((e) => {
+            console.log(e.message) // 打印error2
+        })
+    }
+   * ajaxA() {
+        try {
+            const ret = yield Promise.reject(new Error('error'));
+        } catch(e) {
+            console.log(e.message) // 打印error
+        }
+   }
+    * ajaxB() {
+        //throw new Error('error2') 可以直接抛出
+        const ret = yield Promise.reject(new Error('error2')); // 也可通过promise抛出
+        // return 语句不会执行
+        return ret;
+
+   }
+}
+export default ExceptionModel;
+
+```
 
 ## 最佳实践
 ### 1. 应用场景

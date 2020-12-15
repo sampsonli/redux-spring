@@ -63,4 +63,34 @@ describe('model async function test', function () {
             expect(num).toBe(2);
         })
     });
+
+    it('test throw exception', () => {
+        const store = createStore(() => {});
+        spring(store);
+        const modelName = 'exception function'
+        @service(modelName)
+        class UserModel extends Model {
+            num = 1;
+            * ajax() {
+                try {
+                    this.num = 2;
+                    yield Promise.reject(new Error('hello'));
+                    this.num = 3;
+                } catch (e) {
+                    this.num = 5;
+                    return 6;
+                }
+            }
+        }
+
+
+        let model = <UserModel> store.getState()[modelName];
+        expect(model.num).toBe(1);
+        // @ts-ignore
+        model.ajax().then((num) => {
+            model = <UserModel> store.getState()[modelName];
+            expect(model.num).toBe(5);
+            expect(num).toBe(6);
+        })
+    });
 })
