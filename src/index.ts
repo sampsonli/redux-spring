@@ -1,3 +1,8 @@
+/**
+ * redux-spring
+ * Copyright (c) 2019 sampson Li (lichun) <740056710@qq.com>
+ * @license MIT
+ */
 import {combineReducers} from 'redux';
 import {useState, useEffect} from 'react';
 import {assign, isGenerator} from "./util";
