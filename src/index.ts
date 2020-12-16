@@ -1,6 +1,6 @@
 /**
  * redux-spring
- * Copyright (c) 2020 Sampson Li (LiChun) <740056710@qq.com>
+ * Copyright (c) 2020 Sampson Li (lichun) <740056710@qq.com>
  * @license MIT
  */
 import {combineReducers} from 'redux';
