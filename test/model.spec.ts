@@ -108,4 +108,25 @@ describe('model function and props test', function () {
         model.setData({num: 2});
         expect(store.getState()[modelName]).not.toEqual(model);
     });
+
+    it('test dev modal model static props', () => {
+        const store = createStore(() => {
+        });
+        spring(store);
+        const modelName = 'test model data update'
+
+        @service(modelName)
+        class TestModel extends Model {
+            static a = 10
+        }
+        expect(TestModel.a).toBe(10);
+
+
+        @service(modelName)
+        class Test2Model extends Model {
+            static a = 20
+        }
+        expect(TestModel.a).toBe(10);
+
+    });
 })

@@ -23,6 +23,8 @@ function injectReducer(key, reducer) {
 }
 // 保存所有模块的原型
 const allProto = {};
+// 保存所有模块的static属性 // 方便开发模式热更新静态数据保留
+const allStatic = {};
 
 
 /**
@@ -53,10 +55,10 @@ export function service(ns: string) {
             }
         }
 
-        // 给外面用的原型对象
+        // 给外面用的原型实例
         const prototype = {ns, setData: undefined, reset:undefined, created: undefined};
 
-        // 给内部用的原型对象
+        // 给内部用的原型实例
         const _prototype = {ns, setData: undefined, reset:undefined};
 
         Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
@@ -173,8 +175,20 @@ export function service(ns: string) {
             return state;
         };
         injectReducer(ns, reducer);
+
+        const isHotReload = !!allProto[ns];
+
+        /**
+         * 开发模式 static数据保存和恢复
+         */
+        if(!isHotReload) {
+            allStatic[ns] = assign({}, Clazz);
+        } else {
+            // assign(Clazz, allStatic[ns]);
+        }
+
         // 初始化提供created 方法调用, 热更新不重复调用
-        if(typeof prototype.created === 'function' && !allProto[ns]) {
+        if(typeof prototype.created === 'function' && !isHotReload) {
             prototype.created();
         }
         allProto[ns] = prototype;
