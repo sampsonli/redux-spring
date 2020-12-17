@@ -3,11 +3,11 @@
  * Copyright (c) 2020 Sampson Li (lichun) <740056710@qq.com>
  * @license MIT
  */
-import {combineReducers} from 'redux';
+import {combineReducers, Store} from 'redux';
 import {useState, useEffect} from 'react';
 import {assign, isGenerator} from "./util";
 
-let _store;
+let _store: Store;
 let _asyncReducers = {};
 
 // 注入模块对应的reducer
@@ -184,7 +184,7 @@ export function service(ns: string) {
         if(!isHotReload) {
             allStatic[ns] = assign({}, Clazz);
         } else {
-            // assign(Clazz, allStatic[ns]);
+            assign(Clazz, allStatic[ns]);
         }
 
         // 初始化提供created 方法调用, 热更新不重复调用
@@ -260,7 +260,7 @@ export class Model {
  * @param store --需要注入的store
  * @param asyncReducers --兼容老reducer集合
  */
-export default (store, asyncReducers = {}) => {
+export default (store: Store, asyncReducers = {}) => {
     _store = store;
     _asyncReducers = asyncReducers;
 };

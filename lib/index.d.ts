@@ -1,4 +1,10 @@
 /**
+ * redux-spring
+ * Copyright (c) 2020 Sampson Li (lichun) <740056710@qq.com>
+ * @license MIT
+ */
+import { Store } from 'redux';
+/**
  * 创建模块
  * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
@@ -28,7 +34,7 @@ export declare class Model {
     setData(data: Object): void;
     reset(): void;
 }
-declare const _default: (store: any, asyncReducers?: {}) => void;
+declare const _default: (store: Store, asyncReducers?: {}) => void;
 /**
  * 初始化redux-spring
  * @param store --需要注入的store
