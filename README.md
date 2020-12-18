@@ -496,6 +496,7 @@ export default () => {
 >页面展示和数据可以进一步拆分， 页面中不包含任何逻辑处理， 数据层完全基于model
 >以面向对象的方式进行开发， 对外提供api接口和数据文档，并且一份model可以适配多平台，比如同时适配移动端h5 和pc端页面， 
 >多人协作的时候， 可以ui 和数据完全交给不同人负责，高效完成需求， 同时可以保证代码风格统一。
+
  ![think](https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/think.png)
 
 ## 自己构建
