@@ -27,19 +27,26 @@ export declare function inject<T extends Model>(Class: {
  */
 export declare function resource(ns: string): (clazz: any, attr: any) => void;
 /**
- * 基础模块， 最佳实践，每个模块都应继承基础模块类
+ * 基础模块， 最佳实践，每个模块都应继承该基础模块类
  */
 export declare class Model {
     static ns: string;
+    /**
+     * 批量设置模块数据
+     * @param {Object} data - key-value 对象
+     */
     setData(data: {
         [x in keyof this]?: this[x];
     }): void;
+    /**
+     * 重置模块数据到初始默认值
+     */
     reset(): void;
 }
 declare const _default: (store: Store, asyncReducers?: {}) => void;
 /**
  * 初始化redux-spring
- * @param store --需要注入的store
+ * @param {Store} store --需要注入的store
  * @param asyncReducers --兼容老reducer集合
  */
 export default _default;

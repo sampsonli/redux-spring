@@ -10,8 +10,12 @@ import {assign, isGenerator} from "./util";
 let _store: Store;
 let _asyncReducers = {};
 
-// 注入模块对应的reducer
-function injectReducer(key, reducer) {
+/**
+ * 注入模块对应的reducer
+ * @param {string} key
+ * @param {function} reducer
+ */
+function injectReducer(key: string, reducer) {
     if (_store) {
         _asyncReducers[key] = reducer;
         _store.replaceReducer(combineReducers({
@@ -242,13 +246,22 @@ export function resource(ns: string) {
 }
 
 /**
- * 基础模块， 最佳实践，每个模块都应继承基础模块类
+ * 基础模块， 最佳实践，每个模块都应继承该基础模块类
  */
 export class Model {
     static ns = '';
+
+    /**
+     * 批量设置模块数据
+     * @param {Object} data - key-value 对象
+     */
     setData(data: {[x in keyof this]?: this[x]}) {
         return;
     }
+
+    /**
+     * 重置模块数据到初始默认值
+     */
     reset() {
         return;
     }
@@ -257,7 +270,7 @@ export class Model {
 
 /**
  * 初始化redux-spring
- * @param store --需要注入的store
+ * @param {Store} store --需要注入的store
  * @param asyncReducers --兼容老reducer集合
  */
 export default (store: Store, asyncReducers = {}) => {

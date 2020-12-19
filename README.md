@@ -470,6 +470,23 @@ class ExceptionModel extends Model {
 export default ExceptionModel;
 
 ```
+### 8. 外部调用模块异步方法接收其返回值
+> 以上面 ExceptionModel 为例， 如果页面中调用model中的ajaxA方法， 需要接收方法的返回值， 由于异步方法对外导出的是一个promise， 可以直接用async/await, 或者直接用then/catch方法
+
+```jsx
+export default () => {
+    const model = useModel(ExceptionModel);
+    useEffect(() => {
+        model.ajaxB().then((ret) => console.log(ret)).catch(e => console.log(e.message)); // 打印 error2
+    }, []);
+    // model.user.name 可以读取， 但是不建议这样使用，否则可能导致数据不同步。
+    return (
+        <div className={style.container} />
+    );
+};
+```
+- 注意， 如果你项目中是用的ts， 可能会编译不通过， 可以使用方法回调的方式来实现， 正常情况下，
+ 我们不需要在页面加业务逻辑，也不建议在页面加业务逻辑， 大部分操作都可以在模块类中做处理。这样可以尽量保存页面展示和数据处理分开。
 
 ## 最佳实践
 ### 1. 应用场景
@@ -479,6 +496,7 @@ export default ExceptionModel;
 >页面展示和数据可以进一步拆分， 页面中不包含任何逻辑处理， 数据层完全基于model
 >以面向对象的方式进行开发， 对外提供api接口和数据文档，并且一份model可以适配多平台，比如同时适配移动端h5 和pc端页面， 
 >多人协作的时候， 可以ui 和数据完全交给不同人负责，高效完成需求， 同时可以保证代码风格统一。
+
  ![think](https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/think.png)
 
 ## 自己构建
