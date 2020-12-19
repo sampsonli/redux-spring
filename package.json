@@ -11,7 +11,7 @@
     "依赖注入",
     "按需加载",
     "模块化",
-    "ts redux"
+    "typescript redux"
   ],
   "homepage": "https://github.com/sampsonli/redux-spring",
   "license": "MIT",
