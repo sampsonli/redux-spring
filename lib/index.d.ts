@@ -35,9 +35,7 @@ export declare class Model {
      * 批量设置模块数据
      * @param {Object} data - key-value 对象
      */
-    setData(data: {
-        [x in keyof this]?: this[x];
-    }): void;
+    setData(data: Object): void;
     /**
      * 重置模块数据到初始默认值
      */

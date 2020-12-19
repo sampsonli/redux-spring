@@ -255,7 +255,7 @@ export class Model {
      * 批量设置模块数据
      * @param {Object} data - key-value 对象
      */
-    setData(data: {[x in keyof this]?: this[x]}) {
+    setData(data: Object) {
         return;
     }
 
