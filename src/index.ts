@@ -246,7 +246,7 @@ export function resource(ns: string) {
  */
 export class Model {
     static ns = '';
-    setData(data: Object) {
+    setData(data: {[x in keyof this]?: this[x]}) {
         return;
     }
     reset() {

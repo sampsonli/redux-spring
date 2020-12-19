@@ -31,7 +31,9 @@ export declare function resource(ns: string): (clazz: any, attr: any) => void;
  */
 export declare class Model {
     static ns: string;
-    setData(data: Object): void;
+    setData(data: {
+        [x in keyof this]?: this[x];
+    }): void;
     reset(): void;
 }
 declare const _default: (store: Store, asyncReducers?: {}) => void;
