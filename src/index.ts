@@ -27,7 +27,7 @@ function injectReducer(key: string, reducer) {
 }
 // 保存所有模块的原型
 const allProto = {};
-// 保存所有模块的static属性 // 方便开发模式热更新静态数据保留
+// 保存所有模块的static属性, 方便开发模式热更新静态数据保留
 const allStatic = {};
 
 
@@ -63,7 +63,7 @@ export function service(ns: string) {
         const prototype = {ns, setData: undefined, reset:undefined, created: undefined};
 
         // 给内部用的原型实例
-        const _prototype = {ns, setData: undefined, reset:undefined};
+        const _prototype = {ns, setData: undefined, reset: undefined};
 
         Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
             if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
@@ -255,7 +255,7 @@ export class Model {
      * 批量设置模块数据
      * @param {Object} data - key-value 对象
      */
-    setData<T>(this: T, data: {[p in keyof T]?: T[p]}) {
+    setData<T extends Model>(this: T, data: {[p in Exclude<keyof T, keyof Model>]?: T[p]}) {
         return;
     }
 
