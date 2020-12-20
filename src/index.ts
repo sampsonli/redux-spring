@@ -255,7 +255,7 @@ export class Model {
      * 批量设置模块数据
      * @param {Object} data - key-value 对象
      */
-    setData<T extends Model>(this: T, data: {[p in Exclude<keyof T, keyof Model>]?: T[p]}) {
+    setData<T, K extends keyof T>(this: T, data: {[p in Exclude<K, keyof Model>]?: T[p]}) {
         return;
     }
 
