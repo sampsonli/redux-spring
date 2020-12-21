@@ -36,7 +36,7 @@ const allStatic = {};
  * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
 export function service(ns: string) {
-    return function <T extends Model, K extends {new ():T}>(Clazz: K): K {
+    return function <T extends Model, K extends {new ():T, ns: string}>(Clazz: K): K {
         if (!ns) {
             throw new Error("please define 'ns' before");
         }
@@ -60,10 +60,10 @@ export function service(ns: string) {
         }
 
         // 给外面用的原型实例
-        const prototype = {ns, setData: undefined, reset:undefined, created: undefined};
+        const prototype = {setData: undefined, reset:undefined, created: undefined};
 
         // 给内部用的原型实例
-        const _prototype = {ns, setData: undefined, reset: undefined};
+        const _prototype = {setData: undefined, reset: undefined};
 
         Object.getOwnPropertyNames(Clazz.prototype).forEach(key => {
             if (key !== 'constructor' && typeof Clazz.prototype[key] === 'function') {
@@ -196,7 +196,6 @@ export function service(ns: string) {
             prototype.created();
         }
         allProto[ns] = prototype;
-        // @ts-ignore 此处， 设置模块的静态变量， 覆盖Model继承过来的
         Clazz.ns = ns;
         Clazz.prototype = prototype; // 覆盖初始原型对象
         return Clazz;
@@ -207,8 +206,7 @@ export function service(ns: string) {
  * react hooks 方式获取模块类实例
  * @param Class 模块类
  */
-export const useModel = <T extends Model>(Class: { new(): T }): T => {
-    // @ts-ignore
+export const useModel = <T extends Model>(Class: { new(): T, ns: string }): T => {
     const ns = Class.ns;
     const [data, setData] = useState(() => _store.getState()[ns]);
     useEffect(() => _store.subscribe(() => {
@@ -222,8 +220,7 @@ export const useModel = <T extends Model>(Class: { new(): T }): T => {
  * 按照类型自动注入Model实例
  * @param {Model} Class --模块类
  */
-export function inject<T extends Model>(Class: { new(): T }) {
-    // @ts-ignore
+export function inject<T extends Model>(Class: { new(): T, ns: string }) {
     const ns = Class.ns;
     return (clazz, attr) => {
         if (!clazz.__wired) {

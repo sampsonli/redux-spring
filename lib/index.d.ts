@@ -8,18 +8,25 @@ import { Store } from 'redux';
  * 创建模块
  * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
-export declare function service(ns: string): <T extends Model, K extends new () => T>(Clazz: K) => K;
+export declare function service(ns: string): <T extends Model, K extends {
+    new (): T;
+    ns: string;
+}>(Clazz: K) => K;
 /**
  * react hooks 方式获取模块类实例
  * @param Class 模块类
  */
-export declare const useModel: <T extends Model>(Class: new () => T) => T;
+export declare const useModel: <T extends Model>(Class: {
+    new (): T;
+    ns: string;
+}) => T;
 /**
  * 按照类型自动注入Model实例
  * @param {Model} Class --模块类
  */
 export declare function inject<T extends Model>(Class: {
     new (): T;
+    ns: string;
 }): (clazz: any, attr: any) => void;
 /**
  * 按照模块名自动注入Model实例
