@@ -43,7 +43,7 @@ export declare class Model {
      */
     reset(): void;
 }
-declare const _default: <T extends Store<any, import("redux").AnyAction>>(store: T, asyncReducers?: {}) => (T: any) => T;
+declare const _default: <T extends Store<any, import("redux").AnyAction>>(store: T, asyncReducers?: {}) => T;
 /**
  * 初始化redux-spring
  * @param {Store} store --需要注入的store
