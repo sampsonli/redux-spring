@@ -255,7 +255,7 @@ export class Model {
      * 批量设置模块数据
      * @param {Object} data - key-value 对象
      */
-    setData<T, K extends keyof T>(this: T, data: {[p in Exclude<K, keyof Model>]?: T[p]}) {
+    setData<T>(this: T, data: {[p in Exclude<keyof T, keyof Model>]?: T[p]}) {
         return;
     }
 
@@ -272,8 +272,10 @@ export class Model {
  * 初始化redux-spring
  * @param {Store} store --需要注入的store
  * @param asyncReducers --兼容老reducer集合
+ * @return {Store}
  */
-export default (store: Store, asyncReducers = {}) => {
+export default <T extends Store>(store: T, asyncReducers = {}) => T => {
     _store = store;
     _asyncReducers = asyncReducers;
+    return store;
 };

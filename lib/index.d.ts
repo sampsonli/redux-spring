@@ -35,18 +35,19 @@ export declare class Model {
      * 批量设置模块数据
      * @param {Object} data - key-value 对象
      */
-    setData<T, K extends keyof T>(this: T, data: {
-        [p in Exclude<K, keyof Model>]?: T[p];
+    setData<T>(this: T, data: {
+        [p in Exclude<keyof T, keyof Model>]?: T[p];
     }): void;
     /**
      * 重置模块数据到初始默认值
      */
     reset(): void;
 }
-declare const _default: (store: Store, asyncReducers?: {}) => void;
+declare const _default: <T extends Store<any, import("redux").AnyAction>>(store: T, asyncReducers?: {}) => (T: any) => T;
 /**
  * 初始化redux-spring
  * @param {Store} store --需要注入的store
  * @param asyncReducers --兼容老reducer集合
+ * @return {Store}
  */
 export default _default;
