@@ -13,6 +13,7 @@ describe('model function and props test', function () {
                 this.num = this.num + num;
             }
         }
+
         let model = <TestModel> store.getState()[modelName]
 
         expect(model.num).toBe(0);

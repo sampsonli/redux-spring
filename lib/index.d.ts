@@ -8,7 +8,7 @@ import { Store } from 'redux';
  * 创建模块
  * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
-export declare function service(ns: string): (Clazz: any) => any;
+export declare function service(ns: string): <T extends Model, K extends new () => T>(Clazz: K) => K;
 /**
  * react hooks 方式获取模块类实例
  * @param Class 模块类

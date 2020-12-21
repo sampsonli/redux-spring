@@ -36,7 +36,7 @@ const allStatic = {};
  * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
 export function service(ns: string) {
-    return (Clazz) => {
+    return function <T extends Model, K extends {new ():T}>(Clazz: K): K {
         if (!ns) {
             throw new Error("please define 'ns' before");
         }
@@ -196,6 +196,7 @@ export function service(ns: string) {
             prototype.created();
         }
         allProto[ns] = prototype;
+        // @ts-ignore 此处， 设置模块的静态变量， 覆盖Model继承过来的
         Clazz.ns = ns;
         Clazz.prototype = prototype; // 覆盖初始原型对象
         return Clazz;
@@ -274,7 +275,7 @@ export class Model {
  * @param asyncReducers --兼容老reducer集合
  * @return {Store}
  */
-export default <T extends Store>(store: T, asyncReducers = {}) => T => {
+export default <T extends Store>(store: T, asyncReducers = {}): T  => {
     _store = store;
     _asyncReducers = asyncReducers;
     return store;
