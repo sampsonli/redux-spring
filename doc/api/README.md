@@ -47,7 +47,11 @@ spring(store);
 - 类型: `Function`
 - 参数： Class 需要注入实例的模块类
 
-inject 等价
+### @resource 模块注入
+- 类型: `string`
+- 参数： 需要注入实例的模块名
+
+
 ## useModel
 - 类型: `Function`
 - 参数: Model 模块类名

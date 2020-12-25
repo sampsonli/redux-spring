@@ -10,7 +10,7 @@ import { Store } from 'redux';
  */
 export declare function service(ns: string): <T extends Model, K extends {
     new (): T;
-    ns: string;
+    ns?: string;
 }>(Clazz: K) => K;
 /**
  * react hooks 方式获取模块类实例
@@ -34,7 +34,7 @@ export declare function inject<T extends Model>(Class: {
  */
 export declare function resource(ns: string): (clazz: any, attr: any) => void;
 /**
- * 基础模块， 最佳实践，每个模块都应继承该基础模块类
+ * 模块基类，每个模块都应继承该基础模块类
  */
 export declare class Model {
     static ns: string;

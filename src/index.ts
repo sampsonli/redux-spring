@@ -22,7 +22,7 @@ function injectReducer(key: string, reducer) {
             ..._asyncReducers,
         }));
     } else {
-        throw new Error('spring is not initialized, please invoke "spring(store)" before');
+        throw new Error('redux-spring is not initialized, please invoke "spring(store)" before!');
     }
 }
 // 保存所有模块的原型
@@ -36,7 +36,7 @@ const allStatic = {};
  * @param {string} ns -- 模块名称， 模块名称唯一， 不能有冲突
  */
 export function service(ns: string) {
-    return function <T extends Model, K extends {new ():T, ns: string}>(Clazz: K): K {
+    return function <T extends Model, K extends {new ():T, ns?: string}>(Clazz: K): K {
         if (!ns) {
             throw new Error("please define 'ns' before");
         }
@@ -244,7 +244,7 @@ export function resource(ns: string) {
 }
 
 /**
- * 基础模块， 最佳实践，每个模块都应继承该基础模块类
+ * 模块基类，每个模块都应继承该基础模块类
  */
 export class Model {
     static ns = '';
