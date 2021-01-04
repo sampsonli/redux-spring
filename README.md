@@ -89,13 +89,28 @@ class HomeModel extends Model {
 export default HomeModel;
 ~~~
 1. @service('home') 定义一个模块， 每个模块必须添加此注解， 其中home 是自己给模块取的名称, 如果不想取名，也可直接用module.id， 比如@service(module.id);
-2. redux-spring 大量依赖注解语法， 老版本babel需要配置相应插件；
-3. Model 是个接口， 主要是给model实例和类提供接口api和属性， Model定义可以参考[API说明](https://github.com/sampsonli/redux-spring/blob/master/doc/api/README.md)；
+2. redux-spring 大量依赖最新注解语法， 老版本babel需要配置相应插件；
+3. Model 是个类接口， 主要是给model实例和类提供接口api和属性， Model定义可以参考[API说明](https://github.com/sampsonli/redux-spring/blob/master/doc/api/README.md)；
 4. init() 是一个异步方法，在redux-spring中异步方法都是基于 generator语法， 不推荐用async/await语法， generator和async/await使用方式一模一样；
-5. add() 是定义的普通类方法；
+5. add() 是定义的普通类方法， 此方法给类属性num 加1；
 6. num 类属性，所有类属性最终都会保存在redux的state中；
 7. ***注意*** 不管是普通方法，还是异步方法， 都不能定义为箭头方法， 否则会由于找不到this中的属性而报错；
-8. ***注意*** 保留字 setData,reset, ns，created不能用于自定义方法、属性名。 
+8. ***注意*** 保留字 setData, reset, ns, created不能用于自定义方法、属性名；
+9. ***注意*** 当修改模块中对象类型的属性时， 需要同时更新对象引用值。例如：
+```js
+@service(module.id)
+class DemoModel extends Model {
+    obj = {a: 1};
+
+    updateObj() {
+        this.obj.a = 2; // 错误的做法
+    }
+    updateObj2() {
+        this.obj = {...this.obj, a: 2}; // 正确的做法
+    }
+}
+export default DemoModel;
+```
 
 
 ### 3. 在页面中使用 model
@@ -177,6 +192,7 @@ export default connect(state => ({model: state[HomeModel.ns]}))(Home);
 2. HomeModel.ns 模块定义的名称， 等同于@service('home') 中的'home';
 3. 声明组件属性类型的时候建议用 PropTypes.instanceOf(类名)；
 4. 类组件model注入需要依赖 react-redux模块的Provider，而hooks写法不需要；
+5. 如果是新开项目，对低版本浏览器没有要求，建议都采用react hooks 写法， hooks方便又便捷，可读性也好，前提是使用redux-spring框架。
 
 ## 高级用法
 ### 1. 依赖注入（DI)
@@ -225,11 +241,11 @@ export default HomeModel;
 
 ```
 - 说明
-1. @inject(UserModel)，给属性注入UserModel 实例
+1. @inject(UserModel)，给属性注入UserModel 的实例；
 2. 注入的实例，类方法中可以获取实例属性， 也可以调用注入实例的方法， 但是不能直接修改实例的属性， 只能通过setData方法或者类方法去设置；
-3. 被注入的属性前面建议加上jsDoc注释，表明属性类型，方便后续使用实例属性和方法, 同时建议加@private， 不提供给组件直接使用。
-4. 页面中尽量不要直接引用被注入的属性，否则可能出现数据不同步的情况。注入的属性主要为了解决类方法获取其他模块中数据功能。
-5. ***注意*** 在使用被注入的模块的属性前， 一定要确保被注入的模块的属性有值。
+3. 被注入的属性前面建议加上jsDoc注释，表明属性类型，方便后续使用实例属性和方法, 同时建议加@private， 不提供给组件直接使用；
+4. ***注意*** 在使用被注入的模块的属性前， 一定要确保被注入的模块的属性有值。
+5. ***注意*** 依赖注入主要是解决模块中共享其他模块中数据问题， 尽量避免在页面中使用当前模块中依赖模块中的数据， 如果非要这么使用， 可能会出现数据不同步问题。
 
 
 最后在页面中展示数据
@@ -267,7 +283,7 @@ export default () => {
 ```
 - 注意： 页面中可以直接使用model注入的user,绝大多数情况下没问题， 如果遇到其他模块修改UserModel中的数据， 会导致当前组件中的数据不能及时同步。
 ### 2. 初始化方法
-> 有时候会遇到这种场景， 模块加载的时候进行一些初始化操作， 初始化操作可以定义created方法来实现
+> 有时候会遇到这种场景， 模块加载的时候进行一些初始化操作（注意不是初始化值）， 初始化操作可以定义created方法来实现
 ```js
 @service(module.id)
 class CreatedModel extends Model {
@@ -278,16 +294,16 @@ class CreatedModel extends Model {
     }
     ajaxGet() {
         // 方法逻辑
-    }   
+    }
     created() { // 如果定义了created方法，此方法在模块加载的时候会自动执行
         thia.ajaxGet() // 此方法中可以调用模块中的方法进行初始化
     }
 }
 export default CreatedModel;
 ```
-- 最佳实践， 减少created方法使用， 在模块类中定义init方法，然后放入组件的 React.useEffect方法中调用。
+- 最佳实践， 尽量减少created方法使用， 在模块类中定义init方法，然后放入组件的 React.useEffect方法中调用。
 
-### 3. 快捷的操作model中的数据
+### 3. 便捷地操作model中的数据
 > 有时候页面中需要修改model中的数据， 如果只是修改少量数据，新定义一个方法会大大增加业务代码量， 可以使用 model.setData(params)方法
 > params是一个普通对象， key是要修改的属性名， value是修改后的值。
 ```jsx
@@ -374,7 +390,7 @@ class HomeModel extends Model {
 export default HomeModel;
 ```
 
-- 封装promise实例
+- 封装Promise实例
 ```js
 @service(module.id)
 class HomeModel extends Model {
@@ -480,7 +496,6 @@ export default () => {
     useEffect(() => {
         model.ajaxB().then((ret) => console.log(ret)).catch(e => console.log(e.message)); // 打印 error2
     }, []);
-    // model.user.name 可以读取， 但是不建议这样使用，否则可能导致数据不同步。
     return (
         <div className={style.container} />
     );
@@ -492,7 +507,7 @@ export default () => {
 > redux-spring 存在很多不足， 以下是个人总结的一些问题， 也是接下来改进的方向， 如果有什么好的建议或想法， 欢迎给我留言。
 1. typescript 对generator支持不够理想
     * 比如yield 返回参数无法做自动类型推导， 但是不影响其愉快使用。
-        ```ts
+        ```typescript
         class Test {
             * testFn() {
                 // 此处 a 类型为any， 无法自动推导a为 string 类型
@@ -508,7 +523,7 @@ export default () => {
     * 外部调用异步方法的时候， 无法确定返回值为Promise类型， 需要强制转换， 前面已经提过了。
 2. 自动注入不支持方法参数注入， 目前只支持类属性注入，这点使用体验感觉不是特别好。
 
-3. 有模块依赖的场景， 如果被依赖的模块有更新， 当前模块不能自动更新， 前面也提到过了。
+3. 有模块依赖的场景， 如果被依赖的模块有更新， 当前模块不能自动同步更新， 前面也提到过了。
 
 4. 性能问题
     * 调用模块方法的时候， 特别是异步方法， 底层存有多处数组遍历方法， 随着模块属性量增大， 计算复杂度呈线性增加。

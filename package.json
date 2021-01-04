@@ -1,12 +1,13 @@
 {
   "name": "redux-spring",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "react spring redux 模块化 依赖注入",
   "author": "sampsonli",
   "keywords": [
-    "react",
+    "react 模块",
     "redux 模块",
     "react redux",
+    "react hooks",
     "react spring",
     "依赖注入",
     "按需加载",
