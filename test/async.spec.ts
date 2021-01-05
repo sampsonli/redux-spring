@@ -2,7 +2,7 @@ import spring, {inject, Model, resource, service} from '../src'
 import {createStore} from 'redux';
 
 describe('model async function test', function () {
-    it('test model async func', () => {
+    it('test model async func3', () => {
         const store = createStore(() => {});
         spring(store);
         const modelName = 'test model async 1'
@@ -10,7 +10,7 @@ describe('model async function test', function () {
         class UserModel extends Model {
             name = 'hello';
             * ajax() {
-                this.name = yield new Promise((resolve) => {
+                return  yield new Promise((resolve) => {
                     // resolve(19);
                     setTimeout(() => {
                         resolve(19)
@@ -23,12 +23,12 @@ describe('model async function test', function () {
 
         let model = <UserModel> store.getState()[modelName];
         expect(model.name).toBe('hello');
-        // @ts-ignore
-        model.ajax().then((name) => {
+        model.ajax().next((name) => {
+            console.log('hello');
             expect(name).toBe(19);
             model = <UserModel> store.getState()[modelName];
             expect(model.name).toBe(19);
-        })
+        });
     });
 
     it('test complex function', () => {
