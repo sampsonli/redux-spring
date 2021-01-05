@@ -495,6 +495,7 @@ export default () => {
     const model = useModel(ExceptionModel);
     useEffect(() => {
         model.ajaxB().then((ret) => console.log(ret)).catch(e => console.log(e.message)); // 打印 error2
+        // model.ajaxB().next().value.then((ret) => console.log(ret)).catch(e => console.log(e.message)); // 打印 error2
     }, []);
     return (
         <div className={style.container} />

@@ -96,7 +96,6 @@ export function service(ns: string) {
                             doUpdate(_this);
                             if (tmp.done) {
                                 return tmp.value;
-                                // return Promise.resolve(tmp.value);
                             }
                             if (tmp.value && tmp.value.then) {
                                 return tmp.value.then(data => runGen(ge, data, false, null)).catch(error => runGen(ge, null, true, error));
@@ -104,7 +103,10 @@ export function service(ns: string) {
                             return runGen(ge, tmp.value, false, null);
                         };
                         // 异步方法必须异步执行
-                        return Promise.resolve().then(() => runGen(origin.bind(_this)(...params), null, false, null));
+                        const result = Promise.resolve().then(() => runGen(origin.bind(_this)(...params), null, false, null));
+                        // @ts-ignore 此处为了给外部调用异步方法提供generate方法api支持， 方便项目使用ts接收返回值， 避免强制类型转换使用
+                        result.return = result.next = () => ({value: result, done: true});
+                        return result;
                     }
                     const rootState = _store.getState();
                     const state = rootState[ns];
