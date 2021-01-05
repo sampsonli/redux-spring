@@ -43,7 +43,9 @@ export declare class Model {
      * @param {Object} data - key-value 对象
      */
     setData<T>(this: T, data: {
-        [p in Exclude<keyof T, keyof Model>]?: T[p];
+        [p in {
+            [c in keyof T]: T[c] extends Function ? never : c;
+        }[keyof T]]?: T[p];
     }): void;
     /**
      * 重置模块数据到初始默认值
