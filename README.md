@@ -32,6 +32,11 @@ react-spring 基本理念参考了后端java 中spring框架， DI（依赖注�
 ### 异步操作
 异步操作在开发过程中特别常见， 基本上所有主流库都有不错的支持， 为什么称***完美***, 肯定有自己的一套特殊的解决方案，
 当遇到多个顺序异步操作， 而且异步操作之间有数据修改的情况下可以把修改的数据同步到页面中，而不需要做额外的操作，使得能够和面向对象思想完美融合。
+
+### 其他
+1. 兼容性强， 最低可以兼容到ie8（需要babel转译）；
+2. 模块跟随导入的页面热加载；
+3. 开发模式热更新数据不会丢失， 包括类属性和静态属性；
  
 # 基本原理介绍
  ![flow](https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/flow.png)
@@ -464,6 +469,7 @@ class ExceptionModel extends Model {
     init() {
         this.ajaxA();
         this.ajaxB().then((ret) => {
+        // convert(this.ajaxB()).then((ret) => { // ts需要借助convert转换类型
             console.log('success') // 此处不会执行
         }).catch((e) => {
             console.log(e.message) // 打印error2
@@ -494,16 +500,15 @@ export default ExceptionModel;
 export default () => {
     const model = useModel(ExceptionModel);
     useEffect(() => {
-        model.ajaxB().then((ret) => console.log(ret)).catch(e => console.log(e.message)); // 打印 error2
-        // model.ajaxB().throw(e => console.log(e.message)); // 打印 error2
+        model.ajaxB().then((ret) => console.log(ret)).catch(e => console.log(e.message)); // 打印 error2， 如果项目中使用ts， 会报错， 可以用下面的方法实现
+        // convert(model.ajaxB()).then((ret) => console.log(ret)).catch(e => console.log(e.message)); // ts写法
     }, []);
     return (
         <div className={style.container} />
     );
 };
 ```
-- 注意， 如果你项目中是用的ts， 可能会编译不通过， 可以使用方法回调的方式来实现， 正常情况下，
- 我们不需要在页面加业务逻辑，也不建议在页面写业务逻辑， 大部分操作都可以在模块类中做处理。这样可以尽量保存页面展示和数据处理分开。
+- 注意， 如果你项目中是用的ts， 可能会编译不通过， 可以借助convert 方法转换到Promise类型。
 ## 存在的问题
 > redux-spring 存在很多不足， 以下是个人总结的一些问题， 也是接下来改进的方向， 如果有什么好的建议或想法， 欢迎给我留言。
 1. typescript 对generator支持不够理想
@@ -521,7 +526,7 @@ export default () => {
         
         }
         ```
-    * 外部调用异步方法的时候， 无法确定返回值为Promise类型， 需要强制转换， 前面已经提过了。
+    * 外部或者内部调用模块中异步方法的时候， 无法确定返回值为Promise类型， 需要强制转换， 使用起来没有async/await方便，前面已经提过了。
 2. 自动注入不支持方法参数注入， 目前只支持类属性注入，这点使用体验感觉不是特别好。
 
 3. 有模块依赖的场景， 如果被依赖的模块有更新， 当前模块不能自动同步更新， 前面也提到过了。

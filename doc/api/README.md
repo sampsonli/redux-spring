@@ -58,3 +58,10 @@ spring(store);
 - 返回: 模块实例
 
   react-hooks 获取模块实例
+
+## convert
+- 类型: `Function`
+- 参数: Generator实例
+- 返回: Promise对象
+
+  转换Generator类型到Promise类型

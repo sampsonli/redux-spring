@@ -52,6 +52,11 @@ export declare class Model {
      */
     reset(): void;
 }
+/**
+ * 转换generator类型到promise类型， 如果主项目使用ts开发， 可以通过此方法可以转换到Promise类型避免ts类型提示错误
+ * @param gen 被转换的generator类型
+ */
+export declare const convert: <T>(gen: Generator<Promise<unknown>, T, unknown>) => Promise<T>;
 declare const _default: <T extends Store<any, import("redux").AnyAction>>(store: T, asyncReducers?: {}) => T;
 /**
  * 初始化redux-spring

@@ -103,12 +103,7 @@ export function service(ns: string) {
                             return runGen(ge, tmp.value, false, null);
                         };
                         // 异步方法必须异步执行
-                        const result = Promise.resolve().then(() => runGen(origin.bind(_this)(...params), null, false, null));
-                        // @ts-ignore 此处为了给外部调用异步方法提供generate方法api支持， 方便项目使用ts接收返回值， 避免强制类型转换使用
-                        result.return = result.next = result.then
-                        // @ts-ignore 此处为了给外部调用异步方法提供generate方法api支持， 方便项目使用ts接收返回值， 避免强制类型转换使用
-                        result.throw = result.catch;
-                        return result;
+                        return  Promise.resolve().then(() => runGen(origin.bind(_this)(...params), null, false, null));
                     }
                     const rootState = _store.getState();
                     const state = rootState[ns];
@@ -269,6 +264,13 @@ export class Model {
     }
 }
 
+/**
+ * 转换generator类型到promise类型， 如果主项目使用ts开发， 可以通过此方法可以转换到Promise类型避免ts类型提示错误
+ * @param gen 被转换的generator类型
+ */
+export const convert = <T>(gen:  Generator<Promise<unknown>, T, unknown>): Promise<T> => {
+    return <any>gen;
+}
 
 /**
  * 初始化redux-spring
