@@ -1,10 +1,9 @@
 import spring, {inject, Model, resource, service} from '../src'
-import {createStore} from 'redux';
+import {createStore, Store} from 'redux';
 
 describe('model dependency inject test', function () {
+    const store = spring(<Store>createStore(() => {}));
     it('test model di', () => {
-        const store = createStore(() => {});
-        spring(store);
         const modelName = 'test model di 1'
         const userModelName = 'test model user 2'
         @service(userModelName)

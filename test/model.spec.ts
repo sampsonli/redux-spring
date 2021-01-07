@@ -1,11 +1,10 @@
 import spring, {Model, service} from '../src'
-import {createStore} from 'redux';
+import {createStore, Store} from 'redux';
 
 describe('model function and props test', function () {
+    const store = spring(<Store>createStore(() => {}));
     it('test model class function', () => {
-        const store = createStore(() => {});
-        spring(store);
-        const modelName = 'test model class function'
+        const modelName = 'model function and props test'
         @service(modelName)
         class TestModel extends Model {
             num = 0;
@@ -26,8 +25,6 @@ describe('model function and props test', function () {
     });
 
     it('test model created function', () => {
-        const store = createStore(() => {});
-        spring(store)
         const modelName = 'test model created function'
         @service(modelName)
         class TestModel extends Model {
@@ -41,8 +38,6 @@ describe('model function and props test', function () {
     });
 
     it('test model setData function', () => {
-        const store = createStore(() => {});
-        spring(store);
         const modelName = 'test model setData function'
         @service(modelName)
         class TestModel extends Model {
@@ -60,9 +55,7 @@ describe('model function and props test', function () {
     });
 
     it('test model reset function', () => {
-        const store = createStore(() => {});
-        spring(store);
-        const modelName = 'test model setData function'
+        const modelName = 'test model reset function'
         @service(modelName)
         class TestModel extends Model {
             num = 0;
@@ -82,9 +75,6 @@ describe('model function and props test', function () {
 
     });
     it('test model data update', () => {
-        const store = createStore(() => {
-        });
-        spring(store);
         const modelName = 'test model data update'
 
         @service(modelName)
@@ -111,10 +101,7 @@ describe('model function and props test', function () {
     });
 
     it('test dev modal model static props', () => {
-        const store = createStore(() => {
-        });
-        spring(store);
-        const modelName = 'test model data update'
+        const modelName = 'test dev modal model static props'
 
         @service(modelName)
         class TestModel extends Model {

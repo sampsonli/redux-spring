@@ -1,14 +1,13 @@
 import spring, {convert, inject, Model, resource, service} from '../src'
-import {createStore} from 'redux';
+import {createStore, Store} from 'redux';
 
 describe('model async function test', function () {
-    it('test model async func3', () => {
-        const store = createStore(() => {});
-        spring(store);
-        const modelName = 'test model async 1'
+    const store = spring(<Store>createStore(() => {}));
+    it('test model async func', (done) => {
+        const modelName = 'test model async func'
         @service(modelName)
         class UserModel extends Model {
-            name = 'hello';
+            name = 100;
             * ajax() {
                 this.name = yield new Promise((resolve) => {
                     // resolve(19);
@@ -22,51 +21,47 @@ describe('model async function test', function () {
 
 
         let model = <UserModel> store.getState()[modelName];
-        expect(model.name).toBe('hello');
+        expect(model.name).toBe(100);
         convert(model.ajax()).then((name) => {
             expect(name).toBe(19);
             model = <UserModel> store.getState()[modelName];
             expect(model.name).toBe(19);
+            done();
         })
     });
 
-    it('test complex function', () => {
-        const store = createStore(() => {});
-        spring(store);
-        const modelName = 'complex function'
+    it('test complex function', (done) => {
+        const modelName = 'test complex function'
         @service(modelName)
         class UserModel extends Model {
             num = 1;
             * setNum() {
                 this.num = 2;
-                this.ajax();
                 this.num = yield this.ajax();
+                return this.num;
             }
             * ajax() {
-                const num = this.num;
-                yield new Promise((resolve) => {
+                return yield new Promise((resolve) => {
                     // resolve(19);
                     setTimeout(() => {
                         resolve(19)
                     }, 11)
                 })
-                return num;
             }
         }
 
 
         let model = <UserModel> store.getState()[modelName];
         expect(model.num).toBe(1);
-        // @ts-ignore
-        model.setNum().then((num) => {
-            expect(num).toBe(2);
+        convert(model.setNum()).then((num) => {
+            expect(num).toBe(19);
+            done()
+
         })
     });
 
-    it('test throw exception', () => {
-        const store = createStore(() => {});
-        spring(store);
-        const modelName = 'exception function'
+    it('test throw exception', (done) => {
+        const modelName = 'test throw exception'
         @service(modelName)
         class UserModel extends Model {
             num = 1;
@@ -85,11 +80,11 @@ describe('model async function test', function () {
 
         let model = <UserModel> store.getState()[modelName];
         expect(model.num).toBe(1);
-        // @ts-ignore
-        model.ajax().then((num) => {
+        convert(model.ajax()).then((num) => {
             model = <UserModel> store.getState()[modelName];
             expect(model.num).toBe(5);
             expect(num).toBe(6);
+            done()
         })
     });
 })
