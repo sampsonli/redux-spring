@@ -196,7 +196,7 @@ export function service(ns: string) {
         }
         allProto[ns] = prototype;
         Clazz.ns = ns;
-        Clazz.prototype = prototype; // 覆盖初始原型对象
+        assign(Clazz.prototype, prototype); // 覆盖初始原型对象
         return Clazz;
     };
 }

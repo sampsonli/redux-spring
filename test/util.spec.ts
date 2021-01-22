@@ -4,6 +4,7 @@ import {isGenerator, assign
 describe('util function test', function () {
     it('test isGenerator', () => {
        function *test(){
+           console.log('hello')
            yield 0;
        }
        function test2(){
