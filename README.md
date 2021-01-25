@@ -94,7 +94,7 @@ class HomeModel extends Model {
 export default HomeModel;
 ~~~
 1. @service('home') 定义一个模块， 每个模块必须添加此注解， 其中home 是自己给模块取的名称, 如果不想取名，也可直接用module.id， 比如@service(module.id);
-2. redux-spring 大量依赖最新注解语法， 老版本babel需要配置相应插件；
+2. redux-spring 大量依赖最新注解语法， 需要配置相应babel插件(@babel/plugin-proposal-decorators)；
 3. Model 是个类接口， 主要是给model实例和类提供接口api和属性， Model定义可以参考[API说明](https://github.com/sampsonli/redux-spring/blob/master/doc/api/README.md)；
 4. init() 是一个异步方法，在redux-spring中异步方法都是基于 generator语法， 不推荐用async/await语法， generator和async/await使用方式一模一样；
 5. add() 是定义的普通类方法， 此方法给类属性num 加1；
