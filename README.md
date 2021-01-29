@@ -1,5 +1,5 @@
 
-![](/https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/logo.svg)
+![](https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/logo.svg)
 
 # redux-spring 是什么？
 [![Build Status](https://travis-ci.org/sampsonli/redux-spring.svg?branch=master)](https://travis-ci.org/sampsonli/redux-spring)
