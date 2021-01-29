@@ -1,7 +1,6 @@
-
-![](https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/logo.svg)
-
 # redux-spring 是什么？
+<img src="https://raw.githubusercontent.com/sampsonli/redux-spring/master/doc/logo.svg" width=256 height=256 />
+
 [![Build Status](https://travis-ci.org/sampsonli/redux-spring.svg?branch=master)](https://travis-ci.org/sampsonli/redux-spring)
 [![npm version](https://img.shields.io/npm/v/redux-spring.svg?style=flat)](https://www.npmjs.com/package/redux-spring) 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sampsonli/redux-spring/blob/master/LICENSE)
