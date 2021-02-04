@@ -10,8 +10,10 @@ export function assign(target, from) {
 
 export function isGenerator(fn: Function): boolean {
     // ts 配置es5 有个bug, 只能按照下面的方式解决了
-    if(process.env.NODE_ENV !== 'test' && fn.prototype) { // 浏览器环境
-        return fn.prototype.toString() === '[object Generator]'
+    if(process.env.NODE_ENV !== 'test') { // 浏览器环境
+        const str = Object.prototype.toString.call(fn);
+        // [object GeneratorFunction] or [object Generator]
+        return str.indexOf('[object Generator') === 0
     }
     return fn.toString().indexOf('generator') > -1;
 
