@@ -210,7 +210,9 @@ export const useModel = <T extends Model>(Class: { new(): T, ns: string }): T =>
     const [data, setData] = useState(() => _store.getState()[ns]);
     useEffect(() => _store.subscribe(() => {
         const ret = _store.getState()[ns];
-        setData(ret);
+        if(data !== ret) {
+            setData(ret);
+        }
     }), []);
 
     return data;
